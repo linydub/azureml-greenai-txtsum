@@ -17,16 +17,18 @@
             "weight_decay": "auto"
         }
     },
-
+    
     "scheduler": {
-        "type": "WarmupLR",
+        "type": "WarmupDecayLR",
         "params": {
+            "last_batch_iteration": -1,
+            "total_num_steps": "auto",
             "warmup_min_lr": "auto",
             "warmup_max_lr": "auto",
             "warmup_num_steps": "auto"
         }
     },
-
+    
     "zero_optimization": {
         "stage": 2,
         "allgather_partitions": true,
@@ -40,6 +42,8 @@
 
     "gradient_accumulation_steps": "auto",
     "gradient_clipping": "auto",
+    "steps_per_print": 2000,
     "train_batch_size": "auto",
-    "train_micro_batch_size_per_gpu": "auto"
+    "train_micro_batch_size_per_gpu": "auto",
+    "wall_clock_breakdown": false
 }

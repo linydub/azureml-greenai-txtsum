@@ -532,16 +532,13 @@ def main():
     #trainer.remove_callback(AzureMLCallback)
 
     # td additional args:
-    #early_stopping True
-    #early_stopping_patience 3
-    #early_stopping_threshold 0.1
-    #freeze_embeds True
-    # edit: early stopping callback & training_args
-    #load_best_model_at_end True
-    #metric_for_best_model "eval_rouge2"
-    #greater_is_better True
-
-    #if (extra_args.early_stopping):
+    #early_stopping bool
+    #early_stopping_patience int
+    #early_stopping_threshold float
+    #freeze_embeds bool
+    #freeze_encoder bool
+    
+    # edit: early stopping
     trainer.add_callback(EarlyStoppingCallback(early_stopping_patience=3))
     
     # edit td: carbon_tracker decorator
@@ -551,7 +548,9 @@ def main():
     # edit: tracking_scope(finetune)
     @track_emissions(project_name="carbon-finetune", output_dir=training_args.output_dir)
     def finetune(trainer, checkpoint):
-        return trainer.train(resume_from_checkpoint=checkpoint)
+        results = trainer.train(resume_from_checkpoint=checkpoint)
+        print(results.metrics)
+        return results.metrics
     """
     
     # Training
@@ -569,7 +568,7 @@ def main():
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         
         emissions = tracker.stop() # edit
-        print(f"Finetune emissions: {emissions} CO₂eq (lbs)")
+        logger.info(f"Finetune emissions: {emissions} CO₂eq (lbs)")
         
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
@@ -599,7 +598,7 @@ def main():
         )
         
         emissions = tracker.stop() # edit
-        print(f"Evaluation emissions: {emissions} CO₂eq (lbs)")
+        logger.info(f"Evaluation emissions: {emissions} CO₂eq (lbs)")
         
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
@@ -622,7 +621,7 @@ def main():
         )
         
         emissions = tracker.stop() # edit
-        print(f"Prediction emissions: {emissions} CO₂eq (lbs)")
+        logger.info(f"Prediction emissions: {emissions} CO₂eq (lbs)")
         
         metrics = predict_results.metrics
         max_predict_samples = (

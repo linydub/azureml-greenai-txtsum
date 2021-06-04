@@ -21,4 +21,6 @@ dependencies:
     - mlflow
     - azureml-mlflow
     - fairscale
-    - git+https://github.com/microsoft/DeepSpeed
+    - deepspeed
+    - codecarbon
+    - torch==1.8.1+cu111

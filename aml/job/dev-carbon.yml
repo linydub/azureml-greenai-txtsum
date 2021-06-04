@@ -1,8 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 experiment_name: hf-dev
-description: bart-xsum config fp16-02 test
+description: bart-xsum config fp16-02 fp16_full_eval test
 code:
-    local_path: ../../exp
+    local_path: ../../src
 command: >
     python trainer-wip.py 
     --model_name_or_path "facebook/bart-large" 
@@ -11,20 +11,21 @@ command: >
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
     --max_target_length 64 
-    --seed 322 
     --fp16 True 
     --fp16_opt_level "02" 
+    --fp16_full_eval True 
+    --seed 322 
     --sortish_sampler True 
-    --max_eval_samples 64 
-    --max_predict_samples 64 
-    --per_device_train_batch_size 1 
-    --per_device_eval_batch_size 4 
-    --gradient_accumulation_steps 64 
+    --max_eval_samples 128 
+    --max_predict_samples 128 
+    --per_device_train_batch_size 8 
+    --per_device_eval_batch_size 16 
+    --gradient_accumulation_steps 4 
     --ddp_find_unused_parameters False
-    --max_steps 10 
+    --max_steps 15 
     --evaluation_strategy "steps" 
     --logging_strategy "steps" 
-    --eval_steps 10 
+    --eval_steps 5 
     --logging_steps 5 
     --save_total_limit 10 
     --load_best_model_at_end True 
@@ -43,8 +44,8 @@ inputs:
         data: azureml:hf-xsum:1
         mode: download
 compute:
-    target: azureml:gpu-v100-4
+    target: azureml:gpu-v100-8-lp
     instance_count: 1
 distribution:
     type: pytorch
-    process_count: 4
+    process_count: 8

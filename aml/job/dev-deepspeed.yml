@@ -1,29 +1,29 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 experiment_name: hf-dev
-description: deepspeed fp16 test (bart)
+description: deepspeed zero2 fp16 test (bart)
 code:
-    local_path: ../../exp
+    local_path: ../../src
 command: >
     deepspeed trainer-wip.py 
-    --deepspeed "./ds_config.json" 
+    --deepspeed "./ds_config_zero2.json" 
     --model_name_or_path "facebook/bart-large" 
     --config_name "./bart-xsum-config.json" 
     --dataset_name "xsum" 
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
     --max_target_length 64 
-    --sortish_sampler True 
-    --seed 322 
     --fp16 True 
-    --max_eval_samples 256 
-    --max_predict_samples 256 
-    --per_device_train_batch_size 1 
-    --per_device_eval_batch_size 4 
-    --gradient_accumulation_steps 32 
-    --max_steps 10 
+    --seed 322 
+    --sortish_sampler True 
+    --max_eval_samples 128 
+    --max_predict_samples 128 
+    --per_device_train_batch_size 8 
+    --per_device_eval_batch_size 16 
+    --gradient_accumulation_steps 4 
+    --max_steps 15 
     --evaluation_strategy "steps" 
     --logging_strategy "steps" 
-    --eval_steps 10 
+    --eval_steps 5 
     --logging_steps 5 
     --save_total_limit 10 
     --load_best_model_at_end True 
@@ -36,11 +36,11 @@ command: >
     --output_dir "./outputs/hf-model" 
     --logging_dir "./logs" 
     --cache_dir "./cache"
-environment: azureml:hf-deepspeed:1
+environment: azureml:hf-deepspeed:4
 inputs:
     corpus:
         data: azureml:hf-xsum:1
         mode: download
 compute:
-    target: azureml:gpu-v100-4
+    target: azureml:gpu-v100-8-lp
     instance_count: 1
