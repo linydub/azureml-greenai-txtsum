@@ -1,0 +1,12 @@
+# PyTorch models
+HuggingFace:
+-Pegasus
+-Bart
+-T5
+-*T5 v1.1
+-*ProphetNET
+-LED
+-*BigBirdPegasus
+
+Other:
+-*UniLM (https://github.com/microsoft/unilm/tree/master/s2s-ft)

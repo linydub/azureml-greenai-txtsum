@@ -1,0 +1,61 @@
+[XSUM]
+Pegasus:
+    --model_name_or_path "google/pegasus-large" 
+    --adafactor True 
+    --learning_rate 1e-4 
+    --weight_decay 0.01 
+    --label_smoothing_factor 0.1 
+    --gradient_accumulation_steps {256 / batch_size / num_gpu}
+    
+    "summarization_xsum": {
+      "length_penalty": 0.8,
+      "max_length": 64,
+      "max_position_embeddings": 512
+    }
+
+Bart:
+    --model_name_or_path "facebook/bart-large" 
+    --fp16 True 
+    
+    "summarization_xsum": {
+      "length_penalty": 1,
+      "max_length": 62,
+      "min_length": 11,
+      "num_beams": 6
+    }
+
+T5:
+    --model_name_or_path "t5-small" 
+    --source_prefix "summarize: " 
+    --fp16 True 
+
+    "summarization": {
+      "early_stopping": true,
+      "length_penalty": 2,
+      "max_length": 200,
+      "min_length": 30,
+      "no_repeat_ngram_size": 3,
+      "num_beams": 4,
+      "prefix": "summarize: "
+    }
+
+T5 v1.1:
+    --model_name_or_path "google/t5-v1_1-small" 
+
+ProphetNET:
+    --model_name_or_path "microsoft/prophetnet-large-uncased" 
+    --fp16 True 
+    
+    "summarization": {
+      "early_stopping": true,
+      "length_penalty": 2,
+      "no_repeat_ngram_size": 3,
+      "num_beams": 4
+    }
+    gradient_checkpointing=False
+
+LED (Bart):
+    --model_name_or_path "allenai/led-base-16384" 
+    --fp16 True 
+
+BigBirdPegasus: NO BASE MODEL, NEED TO CONVERT

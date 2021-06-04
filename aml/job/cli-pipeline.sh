@@ -1,0 +1,1 @@
+az ml job create --file ../pipeline/pipeline.yml
