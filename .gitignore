@@ -3,3 +3,8 @@ desktop.ini
 
 # Jupyter notebook checkpoints
 .ipynb_checkpoints
+
+# AML
+.amlignore
+*.amltmp 
+*.amltemp
