@@ -32,7 +32,7 @@ command: >
     --output_dir "./outputs/hf-model" 
     --logging_dir "./logs" 
     --cache_dir "./cache"
-environment: azureml:hf-gpu:1
+environment: azureml:hf-deepspeed:1
 inputs:
     corpus:
         data: azureml:hf-xsum:1

@@ -15,32 +15,37 @@ command: >
     --fp16 True 
     --seed 322 
     --sortish_sampler True 
-    --max_eval_samples 128 
-    --max_predict_samples 128 
+    --max_eval_samples 256 
+    --max_predict_samples 256 
     --per_device_train_batch_size 8 
-    --per_device_eval_batch_size 16 
-    --gradient_accumulation_steps 4 
-    --max_steps 15 
+    --per_device_eval_batch_size 8 
+    --gradient_accumulation_steps 1 
+    --learning_rate 3e-5 
+    --max_steps 20 
     --evaluation_strategy "steps" 
     --logging_strategy "steps" 
-    --eval_steps 5 
-    --logging_steps 5 
+    --eval_steps 10 
+    --logging_steps 10 
     --save_total_limit 10 
+    --train_early_stopping True 
+    --early_stopping_patience 3 
+    --early_stopping_threshold 0.1 
     --load_best_model_at_end True 
     --metric_for_best_model "eval_rouge2" 
     --greater_is_better True 
+    --freeze_embeds True 
+    --freeze_encoder True 
     --do_train 
     --do_predict 
     --predict_with_generate 
     --overwrite_output_dir 
     --output_dir "./outputs/hf-model" 
-    --logging_dir "./logs" 
-    --cache_dir "./cache"
-environment: azureml:hf-deepspeed:4
+    --logging_dir "./logs"
+environment: azureml:hf-deepspeed:2
 inputs:
     corpus:
         data: azureml:hf-xsum:1
         mode: download
 compute:
-    target: azureml:gpu-v100-8-lp
+    target: azureml:gpu-v100-4
     instance_count: 1

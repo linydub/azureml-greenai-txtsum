@@ -1,8 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-experiment_name: hf-trials
-description: training batch size memory test (pegasus 30 steps fp16 ddp)
+experiment_name: hf-dev
+description: pegasus test
 code:
-    local_path: ../../exp
+    local_path: ../../src
 command: >
     python trainer-wip.py 
     --model_name_or_path "google/pegasus-large" 
@@ -11,40 +11,48 @@ command: >
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
     --max_target_length 64 
-    --seed 322 
-    --ddp_find_unused_parameters False 
+    --ddp_find_unused_parameters False
     --fp16 True 
+    --fp16_opt_level "02" 
+    --fp16_full_eval True 
+    --seed 322 
+    --sortish_sampler True 
+    --max_eval_samples 128 
+    --max_predict_samples 128 
+    --per_device_train_batch_size 8 
+    --per_device_eval_batch_size 16 
+    --gradient_accumulation_steps 4 
     --adafactor True 
     --learning_rate 1e-4 
     --weight_decay 0.01 
     --label_smoothing_factor 0.1 
-    --per_device_train_batch_size 8 
-    --per_device_eval_batch_size 30 
-    --gradient_accumulation_steps 4 
-    --max_steps 30 
-    --sortish_sampler True 
+    --num_train_epochs 10.0 
+    --max_steps 15 
+    --evaluation_strategy "steps" 
+    --logging_strategy "steps" 
+    --eval_steps 5 
+    --logging_steps 5 
+    --save_total_limit 10 
+    --train_early_stopping True 
+    --early_stopping_patience 3 
+    --early_stopping_threshold 0.1 
     --load_best_model_at_end True 
     --metric_for_best_model "eval_rouge2" 
     --greater_is_better True 
-    --evaluation_strategy "steps" 
-    --eval_steps 15 
-    --logging_strategy "steps" 
-    --logging_steps 15 
-    --save_total_limit 10 
     --do_train 
+    --do_predict 
     --predict_with_generate 
     --overwrite_output_dir 
     --output_dir "./outputs/hf-model" 
     --logging_dir "./logs" 
-    --cache_dir "./cache"
-environment: azureml:hf-gpu:1
+environment: azureml:hf-carbon:1
 inputs:
     corpus:
         data: azureml:hf-xsum:1
         mode: download
 compute:
-    target: azureml:gpu-v100-8
+    target: azureml:gpu-v100-8-lp
     instance_count: 1
 distribution:
-  type: pytorch
-  process_count: 8
+    type: pytorch
+    process_count: 8

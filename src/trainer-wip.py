@@ -48,7 +48,7 @@ from transformers.utils import check_min_version
 from codecarbon import EmissionsTracker, track_emissions # edit
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-#check_min_version("4.7.0.dev0") # edit
+check_min_version("4.7.0.dev0")
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +61,51 @@ except (LookupError, OSError):
         )
     with FileLock(".lock") as lock:
         nltk.download("punkt", quiet=True)
+
+# td args:
+# batch_size_autoscale https://github.com/BlackHC/toma
+# gradual_freezing
+# pruning https://github.com/huggingface/nn_pruning
+# stf_distillation
+# summeval_metrics https://github.com/Yale-LILY/SummEval
+# codecarbon (enable_tracking, scope)
+
+# edit: extra args
+@dataclass
+class ExtraArguments:
+    """
+    Arguments pertaining to additional training/fine-tuning features/techniques.
+    """
+
+    train_early_stopping: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to add EarlyStoppingCallback for finetuning. This callback depends on "
+            "`load_best_model_at_end` functionality to set best_metric in TrainerState."
+        },
+    )
+    early_stopping_patience: int = field(
+        default=1,
+        metadata={
+            "help": "Use with `metric_for_best_model` to stop training when the specified metric "
+            "worsens for `early_stopping_patience` evaluation calls."
+        },
+    )
+    early_stopping_threshold: Optional[float] = field(
+        default=0.0,
+        metadata={
+            "help": "Use with `metric_for_best_model` and `early_stopping_patience` to denote "
+            "how much the specified metric must improve to satisfy early stopping conditions."
+        },
+    )
+    freeze_embeds: bool = field(
+        default=False,
+        metadata={"help": "Whether to freeze the model's embedding modules."},
+    )
+    freeze_encoder: bool = field(
+        default=False,
+        metadata={"help": "Whether to freeze the model's encoder."},
+    )
 
 @dataclass
 class ModelArguments:
@@ -102,9 +147,9 @@ class DataTrainingArguments:
     """
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
-    # edit: workspace dataset
+    # edit: aml workspace/datastore dataset
     dataset_path: Optional[str] = field(
-        default=None, metadata={"help": "The path to the workspace dataset."}
+        default=None, metadata={"help": "The path to the workspace dataset (AzureML)."}
     )
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
@@ -246,13 +291,13 @@ def main():
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, ExtraArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, data_args, training_args, extra_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
-        model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+        model_args, data_args, training_args, extra_args = parser.parse_args_into_dataclasses()
     
     if data_args.source_prefix is None and model_args.model_name_or_path in [
         "t5-small",
@@ -335,7 +380,6 @@ def main():
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
-    # nan
     config = AutoConfig.from_pretrained(
         model_args.config_name if model_args.config_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
@@ -515,6 +559,46 @@ def main():
         result = {k: round(v, 4) for k, v in result.items()}
         return result
 
+    # edit: param freezing from hf-legacy-seq2seq-utils
+    def freeze_params(model):
+        for par in model.parameters():
+            par.requires_grad = False
+    def freeze_embeds(model):
+        model_type = model.config.model_type
+        
+        if model_type == "t5":
+            freeze_params(model.shared)
+            for d in [model.encoder, model.decoder]:
+                freeze_params(d.embed_tokens)
+        else:
+            freeze_params(model.model.shared)
+            for d in [model.model.encoder, model.model.decoder]:
+                freeze_params(d.embed_positions)
+                freeze_params(d.embed_tokens)
+
+    def grad_status(model):
+        return (par.requires_grad for par in model.parameters())
+    def any_requires_grad(model):
+        return any(grad_status(model))
+    def assert_all_frozen(model):
+        model_grads = list(grad_status(model))
+        n_require_grad = sum(list(map(int, model_grads)))
+        npars = len(model_grads)
+        assert not any(model_grads), f"{n_require_grad/npars:.1%} of {npars} weights require grad"
+        logger.info(f"{n_require_grad/npars:.1%} of {npars} weights require grad")
+    def assert_not_all_frozen(model):
+        model_grads = list(grad_status(model))
+        npars = len(model_grads)
+        assert any(model_grads), f"none of {npars} weights require grad"
+        logger.info(f"none of {npars} weights require grad")
+    
+    # edit: embedding, encorder freezing
+    if extra_args.freeze_embeds:
+        freeze_embeds(model)
+    if extra_args.freeze_encoder:
+        freeze_params(model.get_encoder())
+        assert_all_frozen(model.get_encoder())
+    
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
@@ -526,30 +610,29 @@ def main():
         compute_metrics=compute_metrics if training_args.predict_with_generate else None
     )
 
-    # edit: aml mlflow step error, directly report to aml instead
+    # edit: removes aml mlflow step error
     trainer.remove_callback(MLflowCallback)
     #trainer.add_callback(MLflowNoConfigCallback)
     #trainer.remove_callback(AzureMLCallback)
-
-    # td additional args:
-    #early_stopping bool
-    #early_stopping_patience int
-    #early_stopping_threshold float
-    #freeze_embeds bool
-    #freeze_encoder bool
     
     # edit: early stopping
-    trainer.add_callback(EarlyStoppingCallback(early_stopping_patience=3))
+    if extra_args.train_early_stopping:
+        early_stopping = EarlyStoppingCallback(
+            early_stopping_patience=extra_args.early_stopping_patience,
+            early_stopping_threshold=extra_args.early_stopping_threshold
+        )
+        trainer.add_callback(early_stopping)
+        logger.info("Added EarlyStoppingCallback to trainer")
     
-    # edit td: carbon_tracker decorator
+    # edit td: tracker decorator
     # scope (entire_run/total, finetune, evaluate, predict)
-    # use_codecarbon arg(bool)
+    # enable (bool)
     """
     # edit: tracking_scope(finetune)
     @track_emissions(project_name="carbon-finetune", output_dir=training_args.output_dir)
     def finetune(trainer, checkpoint):
         results = trainer.train(resume_from_checkpoint=checkpoint)
-        print(results.metrics)
+        logger.info(results.metrics)
         return results.metrics
     """
     
@@ -588,8 +671,8 @@ def main():
         logger.info("*** Evaluate ***")
         
         # edit: codecarbon
-        tracker = EmissionsTracker(project_name="carbon-eval", output_dir=training_args.output_dir)
-        tracker.start()
+        #tracker = EmissionsTracker(project_name="carbon-eval", output_dir=training_args.output_dir)
+        #tracker.start()
         
         metrics = trainer.evaluate(
             max_length=data_args.val_max_target_length,
@@ -597,8 +680,8 @@ def main():
             metric_key_prefix="eval"
         )
         
-        emissions = tracker.stop() # edit
-        logger.info(f"Evaluation emissions: {emissions} CO₂eq (lbs)")
+        #emissions = tracker.stop() # edit
+        #logger.info(f"Evaluation emissions: {emissions} CO₂eq (lbs)")
         
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))

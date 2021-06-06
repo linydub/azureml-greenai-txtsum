@@ -6,6 +6,8 @@ HuggingFace:
 -*T5 v1.1
 -*ProphetNET
 -LED
+allenai/led-base-16384
+allenai/led-large-16384
 -*BigBirdPegasus
 
 Other:
