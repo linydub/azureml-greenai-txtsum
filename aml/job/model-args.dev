@@ -1,6 +1,7 @@
 [XSUM]
 Pegasus:
     --model_name_or_path "google/pegasus-large" 
+    --config_name "google/pegasus-xsum" 
     --adafactor True 
     --learning_rate 1e-4 
     --weight_decay 0.01 
@@ -15,7 +16,12 @@ Pegasus:
 
 Bart:
     --model_name_or_path "facebook/bart-large" 
-    --fp16 True 
+    --learning_rate 2e-5 
+    --weight_decay 0.0 
+    --warmup_steps 0 
+    --max_grad_norm 1.0 
+    --label_smoothing_factor 0.1 
+    --effective_batch_size 8
     
     "summarization_xsum": {
       "length_penalty": 1,
@@ -40,7 +46,7 @@ T5:
     }
 
 T5 v1.1:
-    --model_name_or_path "google/t5-v1_1-small" 
+    --model_name_or_path "google/t5-v1_1-large" 
 
 ProphetNET:
     --model_name_or_path "microsoft/prophetnet-large-uncased" 

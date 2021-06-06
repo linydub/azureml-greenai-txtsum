@@ -8,3 +8,9 @@ desktop.ini
 .amlignore
 *.amltmp 
 *.amltemp
+
+# Notes
+*.note
+
+# Dev files
+dev/
