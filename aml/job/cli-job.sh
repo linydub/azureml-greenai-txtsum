@@ -1,1 +1,1 @@
-az ml job create --file ./trainer-dev.yml --stream
+az ml job create --file ./trainer-dev.yml

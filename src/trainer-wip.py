@@ -45,7 +45,7 @@ from transformers import (
 from transformers.file_utils import is_offline_mode
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
 from transformers.utils import check_min_version
-from codecarbon import EmissionsTracker, track_emissions # edit
+#from codecarbon import EmissionsTracker#, track_emissions # edit
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.7.0.dev0")
@@ -64,13 +64,13 @@ except (LookupError, OSError):
 
 # td args:
 # batch_size_autoscale https://github.com/BlackHC/toma
-# gradual_freezing
+# gradual_freezing_callback
 # pruning https://github.com/huggingface/nn_pruning
 # stf_distillation
 # summeval_metrics https://github.com/Yale-LILY/SummEval
-# codecarbon (enable_tracking, scope)
+# codecarbon (enable_tracking, scope) -test overhead
 
-# edit: extra args
+# edit
 @dataclass
 class ExtraArguments:
     """
@@ -285,12 +285,13 @@ summarization_name_mapping = {
 }
 
 
-#@track_emissions(project_name="carbon-total")
+#@track_emissions(project_name="carbon-total") # edit
 def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
+    # edit
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, ExtraArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
@@ -353,7 +354,7 @@ def main():
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
 
-    # edit: load_dataset from data path / cache dir (workspace)
+    # edit: load_dataset from data path
     if data_args.dataset_name is not None:
         if data_args.dataset_path is not None:
             datasets = load_from_disk(data_args.dataset_path)
@@ -565,7 +566,6 @@ def main():
             par.requires_grad = False
     def freeze_embeds(model):
         model_type = model.config.model_type
-        
         if model_type == "t5":
             freeze_params(model.shared)
             for d in [model.encoder, model.decoder]:
@@ -597,7 +597,7 @@ def main():
         freeze_embeds(model)
     if extra_args.freeze_encoder:
         freeze_params(model.get_encoder())
-        assert_all_frozen(model.get_encoder())
+        #assert_all_frozen(model.get_encoder())
     
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
@@ -612,7 +612,6 @@ def main():
 
     # edit: removes aml mlflow step error
     trainer.remove_callback(MLflowCallback)
-    #trainer.add_callback(MLflowNoConfigCallback)
     #trainer.remove_callback(AzureMLCallback)
     
     # edit: early stopping
@@ -625,8 +624,7 @@ def main():
         logger.info("Added EarlyStoppingCallback to trainer")
     
     # edit td: tracker decorator
-    # scope (entire_run/total, finetune, evaluate, predict)
-    # enable (bool)
+    # enable, scope (entire_run/total, finetune, evaluate, predict)
     """
     # edit: tracking_scope(finetune)
     @track_emissions(project_name="carbon-finetune", output_dir=training_args.output_dir)
@@ -643,15 +641,16 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
+        
         # edit: codecarbon
-        tracker = EmissionsTracker(project_name="carbon-finetune", output_dir=training_args.output_dir)
-        tracker.start()
+        #tracker = EmissionsTracker(project_name="carbon-finetune", output_dir=training_args.output_dir)
+        #tracker.start()
         
         #train_result = finetune(trainer, checkpoint) # edit
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         
-        emissions = tracker.stop() # edit
-        logger.info(f"Finetune emissions: {emissions} CO₂eq (lbs)")
+        #emissions = tracker.stop() # edit
+        #logger.info(f"Finetune emissions: {emissions} CO₂eq (lbs)")
         
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
@@ -693,8 +692,8 @@ def main():
         logger.info("*** Predict ***")
 
         # edit: codecarbon
-        tracker = EmissionsTracker(project_name="carbon-predict", output_dir=training_args.output_dir)
-        tracker.start()
+        #tracker = EmissionsTracker(project_name="carbon-predict", output_dir=training_args.output_dir)
+        #tracker.start()
         
         predict_results = trainer.predict(
             predict_dataset,
@@ -703,8 +702,8 @@ def main():
             num_beams=data_args.num_beams,
         )
         
-        emissions = tracker.stop() # edit
-        logger.info(f"Prediction emissions: {emissions} CO₂eq (lbs)")
+        #emissions = tracker.stop() # edit
+        #logger.info(f"Prediction emissions: {emissions} CO₂eq (lbs)")
         
         metrics = predict_results.metrics
         max_predict_samples = (
