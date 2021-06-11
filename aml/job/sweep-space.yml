@@ -1,10 +1,19 @@
 search_space:
-    lr:
-        type: choice
-        values: [0.00001, 0.00003, 0.00005, 0.0001]
     seed:
         type: randint
-        upper: 32200
+        upper: 322322
+    grad_accumulation:
+        type: choice
+        values: [1, 2, 4, 8, 16, 32]
+    lr:
+        type: choice
+        values: [0.00001, 0.00003, 0.00005, 0.00008, 0.0001]
+    weight_decay:
+        type: choice
+        values: [0.0, 0.01]
+    label_smoothing:
+        type: choice
+        values: [0.0, 0.1]
     sortish_sampler:
         type: choice
         values: [0, 1]
@@ -14,6 +23,12 @@ search_space:
     freeze_encoder:
         type: choice
         values: [0, 1]
-    grad_accumulation:
+    fp16_level:
         type: choice
-        values: [1, 2, 4, 8, 16, 32]
+        values: ["00", "01", "02"]
+    fp16_eval:
+        type: choice
+        values: [0, 1]
+    deepspeed:
+        type: choice
+        values: ["", "--deepspeed ./ds_config_zero2.json ", "--deepspeed ./ds_config_zero3.json "]

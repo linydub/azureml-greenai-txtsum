@@ -1,3 +1,10 @@
+    --train_early_stopping True 
+    --early_stopping_patience 3 
+    --early_stopping_threshold 0.1 
+    --load_best_model_at_end True 
+    --metric_for_best_model "eval_rouge2" 
+    --greater_is_better True 
+
 [XSUM]
 Pegasus:
     --model_name_or_path "google/pegasus-large" 
@@ -21,7 +28,7 @@ Bart:
     --warmup_steps 0 
     --max_grad_norm 1.0 
     --label_smoothing_factor 0.1 
-    --effective_batch_size 8
+    --effective_batch_size 8 
     
     "summarization_xsum": {
       "length_penalty": 1,

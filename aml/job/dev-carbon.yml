@@ -1,6 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 experiment_name: hf-dev
-description: bart-xsum config freeze_embeds freeze_encoder test
+description: bart-xsum config
 code:
     local_path: ../../src
 command: >

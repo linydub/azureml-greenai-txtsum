@@ -32,11 +32,11 @@
     "zero_optimization": {
         "stage": 3,
         "offload_optimizer": {
-            "device": "cpu",
+            "device": "none",
             "pin_memory": true
         },
         "offload_param": {
-            "device": "cpu",
+            "device": "none",
             "pin_memory": true
         },
         "overlap_comm": true,
@@ -52,8 +52,17 @@
 
     "gradient_accumulation_steps": "auto",
     "gradient_clipping": "auto",
-    "steps_per_print": 2000,
+    "steps_per_print": 5000,
     "train_batch_size": "auto",
     "train_micro_batch_size_per_gpu": "auto",
-    "wall_clock_breakdown": false
+    "wall_clock_breakdown": false,
+    
+    "flops_profiler": {
+        "enabled": true,
+        "profile_step": 15,
+        "module_depth": -1,
+        "top_modules": 1,
+        "detailed": true,
+        "output_file": "./outputs"
+    }
 }
