@@ -1,7 +1,14 @@
+cmd_args: >
+        --fp16_opt_level {search_space.fp16_level} 
+        --label_smoothing_factor {search_space.label_smoothing} 
+        --weight_decay {search_space.weight_decay} 
 search_space:
-    seed:
+    seed_rand:
         type: randint
         upper: 322322
+    seed:
+        type: choice
+        values: [1, 99, 100, 123, 999, 1000, 1234, 9999, 12345]
     grad_accumulation:
         type: choice
         values: [1, 2, 4, 8, 16, 32]
@@ -31,4 +38,4 @@ search_space:
         values: [0, 1]
     deepspeed:
         type: choice
-        values: ["", "--deepspeed ./ds_config_zero2.json ", "--deepspeed ./ds_config_zero3.json "]
+        values: ["--deepspeed ./ds_zero2.json ", "--deepspeed ./ds_zero2_offload.json ", "--deepspeed ./ds_zero3.json "]

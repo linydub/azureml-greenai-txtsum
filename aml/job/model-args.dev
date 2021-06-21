@@ -1,10 +1,3 @@
-    --train_early_stopping True 
-    --early_stopping_patience 3 
-    --early_stopping_threshold 0.1 
-    --load_best_model_at_end True 
-    --metric_for_best_model "eval_rouge2" 
-    --greater_is_better True 
-
 [XSUM]
 Pegasus:
     --model_name_or_path "google/pegasus-large" 
@@ -40,7 +33,6 @@ Bart:
 T5:
     --model_name_or_path "t5-small" 
     --source_prefix "summarize: " 
-    --fp16 True 
 
     "summarization": {
       "early_stopping": true,
@@ -57,7 +49,6 @@ T5 v1.1:
 
 ProphetNET:
     --model_name_or_path "microsoft/prophetnet-large-uncased" 
-    --fp16 True 
     
     "summarization": {
       "early_stopping": true,
@@ -65,10 +56,9 @@ ProphetNET:
       "no_repeat_ngram_size": 3,
       "num_beams": 4
     }
-    gradient_checkpointing=False
+    --gradient_checkpointing False
 
 LED (Bart):
     --model_name_or_path "allenai/led-base-16384" 
-    --fp16 True 
 
-BigBirdPegasus: NO BASE MODEL, NEED TO CONVERT
+BigBirdPegasus: NO BASE MODEL
