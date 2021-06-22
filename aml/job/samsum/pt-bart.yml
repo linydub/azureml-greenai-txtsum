@@ -1,46 +1,38 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-experiment_name: hf-demo
-description: bart samsum
+experiment_name: hf-samsum
+tags:
+    model: "bart-large"
+    seed: "1"
+    epoch: "3.0"
+    learning_rate: "5e-5"
+    batch_size: "64"
 code:
     local_path: ../../src
 command: >
     python trainer-wip.py 
     --model_name_or_path "facebook/bart-large" 
-    --config_name "./bart-xsum-config.json" 
+    --config_name "./configs/bart-xsum-config.json" 
     --dataset_name "samsum" 
     --dataset_path {inputs.corpus} 
-    --max_source_length 320 
-    --max_target_length 64 
+    --max_source_length 512 
+    --max_target_length 90 
     --ddp_find_unused_parameters False 
     --fp16 True 
-    --fp16_opt_level "02" 
-    --fp16_full_eval True 
-    --seed 322 
-    --sortish_sampler True 
+    --seed 1 
     --per_device_train_batch_size 8 
     --per_device_eval_batch_size 8 
     --gradient_accumulation_steps 1 
-    --learning_rate 2e-5 
+    --learning_rate 5e-5 
     --num_train_epochs 3.0 
     --evaluation_strategy "epoch" 
     --logging_strategy "epoch" 
-    --logging_steps 100 
-    --save_total_limit 10 
-    --train_early_stopping True 
-    --early_stopping_patience 2 
-    --early_stopping_threshold 0.1 
-    --load_best_model_at_end True 
-    --metric_for_best_model "eval_rouge2" 
-    --greater_is_better True 
-    --freeze_embeds False 
-    --freeze_encoder False 
     --do_train 
     --do_predict 
     --predict_with_generate 
     --overwrite_output_dir 
     --output_dir "./outputs/hf-model" 
-    --logging_dir "./logs" 
-environment: azureml:hf-carbon:1
+    --logging_dir "./logs"
+environment: azureml:hf-deepspeed:2
 inputs:
     corpus:
         data: azureml:hf-samsum:1

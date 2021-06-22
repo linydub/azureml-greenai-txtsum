@@ -19,7 +19,7 @@ command: >
     --per_device_train_batch_size 1 
     --per_device_eval_batch_size 4 
     --gradient_accumulation_steps 64 
-    --ddp_find_unused_parameters False
+    --ddp_find_unused_parameters False 
     --max_steps 10 
     --evaluation_strategy "steps" 
     --logging_strategy "steps" 
@@ -45,7 +45,7 @@ inputs:
         data: azureml:hf-xsum:1
         mode: download
 compute:
-    target: azureml:nc24rsV3
+    target: azureml:gpu-v100-4
     instance_count: 1
 distribution:
     type: pytorch

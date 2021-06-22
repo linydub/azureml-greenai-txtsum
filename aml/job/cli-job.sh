@@ -1,1 +1,1 @@
-az ml job create --file ./trainer-dev.yml
+az ml job create --file ./txtsum-trainer.yml
