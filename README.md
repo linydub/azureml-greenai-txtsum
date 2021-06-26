@@ -16,15 +16,15 @@ https://huggingface.co/henryu-lin/bart-large-samsum
 
 
 #### Case study (by June 30th?):
--Retrieve & compile experiment benchmark results & comparisons (with resource/carbon metrics & cost)  
+-Retrieve & compile experiment benchmark results (with resource/carbon metrics & cost)  
 -Pretrained Seq2Seq model comparisons on different model scale, pretrained objectives, pretrained corpus  
 -Core cost reduction experiments: baseline (PyTorch), sparse attention (LED, BigBird), parameter freezing (embeds, encoder), deepSpeed (ZeRO 2, ZeRO 3, CPU Offload)  
 
 
 
-#### Extras:
+#### Extras (optional):
 -Summarization experiments' modified Hugging Face trainer documentation  
 -Fine-tuning guide (tips & insights)  
 -Additional cost efficient training/fine-tuning strategy experiments  
 -Case study in-depth evaluation  
-*If these experiments are worthwhile, I'll finish evaluations & do a proper paper/blog write-up..  
+*Currently working on this project solo.. If these experiments are worthwhile and time permits, I'll try to finish the evaluations & do a proper paper/blog write-up.  
