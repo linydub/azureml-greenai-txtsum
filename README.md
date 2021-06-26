@@ -1,6 +1,6 @@
 # aml-hf-txtsum
 ### NLP Text Summarization
-This project includes a training sample and guide for training Hugging Face models on AzureML (with AML 2.0 CLI) similar to Hugging Face's SageMaker guides. The project also includes a case study that evaluates benefits and trade-offs of training strategies that could potentially reduce fine-tuning costs for pretrained encoder-decoder Transformer-based models on supervised abstractive text summarization. The empirical benchmark results produced from the case study experiments (including resource/carbon metrics & fine-tuning costs) will be made available publicly for users to use as a reference for model selection/development or other research.  
+This project includes a training sample and guide for training Hugging Face models on the Microsoft's Azure ML platform (with AML 2.0 CLI) similar to Hugging Face's Amazon SageMaker guides. The project also includes a case study that evaluates benefits and trade-offs of training strategies that could potentially reduce fine-tuning costs for pretrained encoder-decoder Transformer-based models on supervised abstractive text summarization. The empirical benchmark results produced from the case study experiments (which includes compute/power/carbon metrics & fine-tuning costs) will be made available publicly for users to use as a reference for model selection/development and/or other research.  
 <br/>
 
 
