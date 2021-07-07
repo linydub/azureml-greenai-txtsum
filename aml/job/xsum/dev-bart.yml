@@ -30,7 +30,6 @@ command: >
     --logging_strategy "steps" 
     --eval_steps 10 
     --logging_steps 5 
-    --save_total_limit 10 
     --freeze_embeds False 
     --freeze_encoder False 
     --train_early_stopping True 

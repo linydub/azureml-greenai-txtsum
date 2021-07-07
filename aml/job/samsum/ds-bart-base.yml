@@ -1,35 +1,33 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 experiment_name: samsum
 tags:
-    model: "pegasus-xsum"
+    model: "bart-base"
     seed: "1"
     epoch: "3.0"
-    learning_rate: "1e-4"
+    learning_rate: "5e-5"
     batch_size: "256"
+    deepspeed: "true"
+    zero_offload: "false"
 code:
     local_path: ../../src
 command: >
-    python trainer-wip.py 
-    --model_name_or_path "google/pegasus-xsum" 
-    --config_name "./configs/pegasus-xsum-config.json" 
+    deepspeed trainer-wip.py 
+    --deepspeed "./configs/ds_zero2.json" 
+    --model_name_or_path "facebook/bart-base" 
+    --config_name "./configs/bart-base-samsum.json" 
     --dataset_name "samsum" 
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
     --max_target_length 90 
-    --ddp_find_unused_parameters False 
     --fp16 True 
-    --adafactor True 
     --seed 1 
-    --per_device_train_batch_size 8 
-    --per_device_eval_batch_size 16 
-    --gradient_accumulation_steps 2 
-    --learning_rate 1e-4 
+    --per_device_train_batch_size 32 
+    --per_device_eval_batch_size 32 
+    --gradient_accumulation_steps 1 
+    --learning_rate 5e-5 
     --num_train_epochs 3.0 
-    --weight_decay 0.01 
     --evaluation_strategy "epoch" 
     --logging_strategy "epoch" 
-    --freeze_embeds False 
-    --freeze_encoder False 
     --do_train 
     --do_predict 
     --predict_with_generate 
@@ -44,6 +42,3 @@ inputs:
 compute:
     target: azureml:gpu-v100-8-lp
     instance_count: 1
-distribution:
-    type: pytorch
-    process_count: 8

@@ -8,7 +8,7 @@ az login
 az account set -s 6560575d-fa06-4e7d-95fb-f962e74efd7a
 az configure --defaults group="UW-Embeddings" workspace="TxtSum" location="westus2"
 
-pip install psutil sentencepiece protobuf py7zr numpy nltk torch rouge-score ray[tune] datasets transformers mlflow --upgrade
+pip install psutil sentencepiece protobuf py7zr numpy nltk torch rouge-score ray[tune] datasets transformers mlflow fairscale deepspeed --upgrade
 
 az ml environment create --file ../env/hf-env.yml
 az ml data create --file ../data/data-local.yml

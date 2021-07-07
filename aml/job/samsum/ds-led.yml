@@ -1,9 +1,9 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-experiment_name: hf-tests
+experiment_name: samsum
 tags:
     model: "led-large"
     seed: "1"
-    epoch: "1.0"
+    epoch: "3.0"
     learning_rate: "5e-5"
     batch_size: "64"
     deepspeed: "true"
@@ -14,6 +14,7 @@ command: >
     deepspeed trainer-wip.py 
     --deepspeed "./configs/ds_zero2.json" 
     --model_name_or_path "allenai/led-large-16384" 
+    --config_name "./configs/led-xsum-config.json" 
     --dataset_name "samsum" 
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
@@ -24,16 +25,14 @@ command: >
     --per_device_eval_batch_size 8 
     --gradient_accumulation_steps 1 
     --learning_rate 5e-5 
-    --num_train_epochs 1.0 
+    --num_train_epochs 3.0 
     --evaluation_strategy "epoch" 
     --logging_strategy "epoch" 
-    --freeze_embeds False 
-    --freeze_encoder False 
     --do_train 
     --do_predict 
     --predict_with_generate 
     --overwrite_output_dir 
-    --output_dir "./outputs/hf-model" 
+    --output_dir "./outputs" 
     --logging_dir "./logs"
 environment: azureml:hf-deepspeed:2
 inputs:

@@ -1,11 +1,11 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-experiment_name: hf-samsum
+experiment_name: samsum
 tags:
     model: "bart-large"
     seed: "1"
     epoch: "3.0"
     learning_rate: "5e-5"
-    batch_size: "64"
+    batch_size: "128"
 code:
     local_path: ../../src
 command: >
@@ -19,8 +19,8 @@ command: >
     --ddp_find_unused_parameters False 
     --fp16 True 
     --seed 1 
-    --per_device_train_batch_size 8 
-    --per_device_eval_batch_size 8 
+    --per_device_train_batch_size 16 
+    --per_device_eval_batch_size 16 
     --gradient_accumulation_steps 1 
     --learning_rate 5e-5 
     --num_train_epochs 3.0 
@@ -30,9 +30,9 @@ command: >
     --do_predict 
     --predict_with_generate 
     --overwrite_output_dir 
-    --output_dir "./outputs/hf-model" 
+    --output_dir "./outputs" 
     --logging_dir "./logs"
-environment: azureml:hf-deepspeed:2
+environment: azureml:hf-deepspeed:3
 inputs:
     corpus:
         data: azureml:hf-samsum:1
