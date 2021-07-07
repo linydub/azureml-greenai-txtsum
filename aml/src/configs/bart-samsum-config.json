@@ -2,7 +2,11 @@
   "_num_labels": 3,
   "activation_dropout": 0.0,
   "activation_function": "gelu",
+  "add_bias_logits": false,
   "add_final_layer_norm": false,
+  "architectures": [
+    "BartForConditionalGeneration"
+  ],
   "attention_dropout": 0.0,
   "bos_token_id": 0,
   "classif_dropout": 0.0,
@@ -19,9 +23,9 @@
   "encoder_layerdrop": 0.0,
   "encoder_layers": 12,
   "eos_token_id": 2,
-  "force_bos_token_to_be_generated": true,
-  "forced_bos_token_id": 0,
-  "forced_eos_token_id": 2,
+  "eos_token_ids": [
+    2
+  ],
   "id2label": {
     "0": "LABEL_0",
     "1": "LABEL_1",
@@ -34,19 +38,23 @@
     "LABEL_1": 1,
     "LABEL_2": 2
   },
-  "length_penalty": 2.0,
-  "max_length": 142,
+  "max_length": 62,
   "max_position_embeddings": 1024,
-  "min_length": 56,
+  "min_length": 11,
   "model_type": "bart",
   "no_repeat_ngram_size": 3,
   "normalize_before": false,
-  "num_beams": 4,
+  "normalize_embedding": true,
+  "num_beams": 6,
   "num_hidden_layers": 12,
   "output_past": true,
   "pad_token_id": 1,
   "prefix": " ",
+  "replacing_rate": 0,
   "scale_embedding": false,
+  "static_position_embeddings": false,
+  "student_decoder_layers": null,
+  "student_encoder_layers": null,
   "task_specific_params": {},
-  "vocab_size": 50265
+  "vocab_size": 50264
 }

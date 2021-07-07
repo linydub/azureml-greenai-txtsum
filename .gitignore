@@ -5,7 +5,7 @@ desktop.ini
 .ipynb_checkpoints
 
 # AML
-.amlignore
+*.amlignore
 *.amltmp 
 *.amltemp
 

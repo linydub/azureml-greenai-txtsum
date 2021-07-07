@@ -1,5 +1,4 @@
 cmd_args: >
-        --fp16_opt_level {search_space.fp16_level} 
         --label_smoothing_factor {search_space.label_smoothing} 
         --weight_decay {search_space.weight_decay} 
 search_space:
@@ -9,6 +8,9 @@ search_space:
     seed:
         type: choice
         values: [1, 99, 100, 123, 999, 1000, 1234, 9999, 12345]
+    bs:
+        type: choice
+        values: [32, 16, 8, 4, 2, 1]
     grad_accumulation:
         type: choice
         values: [1, 2, 4, 8, 16, 32]
@@ -17,25 +19,26 @@ search_space:
         values: [0.00001, 0.00003, 0.00005, 0.00008, 0.0001]
     weight_decay:
         type: choice
-        values: [0.0, 0.01]
+        values: [0.0, 0.1, 0.01]
     label_smoothing:
         type: choice
         values: [0.0, 0.1]
-    sortish_sampler:
-        type: choice
-        values: [0, 1]
+
     freeze_embeds:
         type: choice
         values: [0, 1]
     freeze_encoder:
         type: choice
         values: [0, 1]
-    fp16_level:
-        type: choice
-        values: ["00", "01", "02"]
     fp16_eval:
         type: choice
         values: [0, 1]
     deepspeed:
         type: choice
         values: ["--deepspeed ./ds_zero2.json ", "--deepspeed ./ds_zero2_offload.json ", "--deepspeed ./ds_zero3.json "]
+    model:
+        type: choice
+        values: ["facebook/bart-large", "facebook/bart-large-xsum", "facebook/bart-large-cnn"]
+    sortish_sampler: # doesnt work no difference
+        type: choice
+        values: [0, 1]

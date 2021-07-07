@@ -12,5 +12,3 @@ az configure --defaults group="UW-Embeddings" workspace="TxtSum" location="westu
 az ml environment create --file ./env/hf-env.yml
 az ml data create --file ./data/data-local.yml
 az ml compute create --file ./compute/gpu-v100-lp.yml
-
-pip install psutil sentencepiece protobuf py7zr numpy nltk torch rouge-score ray[tune] datasets transformers mlflow fairscale deepspeed --upgrade

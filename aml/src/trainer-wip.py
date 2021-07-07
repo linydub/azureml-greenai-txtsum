@@ -679,8 +679,7 @@ def main():
             metric_key_prefix="eval"
         )
         
-        #emissions = tracker.stop() # edit
-        #logger.info(f"Evaluation emissions: {emissions} CO₂eq (lbs)")
+        #tracker.stop() # edit
         
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
@@ -702,8 +701,7 @@ def main():
             num_beams=data_args.num_beams,
         )
         
-        #emissions = tracker.stop() # edit
-        #logger.info(f"Prediction emissions: {emissions} CO₂eq (lbs)")
+        #tracker.stop() # edit
         
         metrics = predict_results.metrics
         max_predict_samples = (

@@ -1,24 +1,22 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-experiment_name: hf-eval
+experiment_name: xsum
+tags:
+    model: "bart-xsum"
 code:
-    local_path: ../../exp
+    local_path: ../../src
 command: >
     python trainer-wip.py 
-    --model_name_or_path "google/pegasus-xsum" 
+    --model_name_or_path "facebook/bart-large-xsum" 
     --dataset_name "xsum" 
     --dataset_path {inputs.corpus} 
     --fp16 True 
-    --adafactor True 
-    --label_smoothing_factor 0.1 
-    --sortish_sampler True 
     --per_device_eval_batch_size 32 
-    --predict_with_generate 
     --do_predict 
-    --ddp_find_unused_parameters False 
-    --output_dir "./outputs/hf-eval" 
-    --logging_dir "./logs" 
-    --cache_dir "./cache"
-environment: azureml:hf-gpu:1
+    --predict_with_generate 
+    --overwrite_output_dir 
+    --output_dir "./outputs" 
+    --logging_dir "./logs"
+environment: azureml:hf-deepspeed:3
 inputs:
     corpus:
         data: azureml:hf-xsum:1
@@ -27,5 +25,5 @@ compute:
     target: azureml:gpu-v100-8-lp
     instance_count: 1
 distribution:
-  type: pytorch
-  process_count: 8
+    type: pytorch
+    process_count: 8
