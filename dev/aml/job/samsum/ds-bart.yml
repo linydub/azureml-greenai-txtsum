@@ -1,32 +1,25 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 experiment_name: samsum
-tags:
-    model: "bart-base"
-    seed: "1"
-    epoch: "3.0"
-    learning_rate: "5e-5"
-    batch_size: "256"
-    deepspeed: "true"
-    zero_offload: "false"
 code:
     local_path: ../../src
 command: >
     deepspeed trainer-wip.py 
     --deepspeed "./configs/ds_zero2.json" 
-    --model_name_or_path "facebook/bart-base" 
-    --config_name "./configs/bart-base-samsum.json" 
+    --model_name_or_path "facebook/bart-large" 
+    --config_name "./configs/bart-xsum-config.json" 
     --dataset_name "samsum" 
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
     --max_target_length 90 
     --fp16 True 
     --seed 1 
-    --per_device_train_batch_size 32 
-    --per_device_eval_batch_size 32 
+    --per_device_train_batch_size 16 
+    --per_device_eval_batch_size 16 
     --gradient_accumulation_steps 1 
     --learning_rate 5e-5 
     --num_train_epochs 3.0 
-    --evaluation_strategy "epoch" 
+    --weight_decay 0.1 
+    --evaluation_strategy "epoch"
     --logging_strategy "epoch" 
     --do_train 
     --do_predict 

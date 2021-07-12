@@ -19,9 +19,9 @@ model-index:
 widget:
 - text: | 
     Henry: Hey, is Nate coming over to watch the movie tonight?
-    Kevin: Yea, he said he'll be arriving a bit later at around 7 since he gets off of work at 6. Have you taken out the garbage yet?
+    Kevin: Yea, he said he'll be arriving a bit later at around 7 since he gets off of work at 6. Have you taken out the garbage yet? It's starting to make the kitchen really smell.
     Henry: Oh I forgot. I'll do that once I'm finished with my assignment for my math class.
-    Kevin: Yea, you should take it out as soon as possible. And also, Nate is bringing his girlfriend.
+    Kevin: Yea, you should take it out as soon as possible. And also, Nate is bringing his girlfriend too.
     Henry: Nice, I'm really looking forward to seeing them again.
 ---
 
@@ -82,9 +82,9 @@ from transformers import pipeline
 summarizer = pipeline("summarization", model="henryu-lin/bart-large-samsum")
 
 conversation = '''Henry: Hey, is Nate coming over to watch the movie tonight?
-    Kevin: Yea, he said he'll be arriving a bit later at around 7 since he gets off of work at 6. Have you taken out the garbage yet?
+    Kevin: Yea, he said he'll be arriving a bit later at around 7 since he gets off of work at 6. Have you taken out the garbage yet? It's starting to make the kitchen really smell.
     Henry: Oh I forgot. I'll do that once I'm finished with my assignment for my math class.
-    Kevin: Yea, you should take it out as soon as possible. And also, Nate is bringing his girlfriend.
+    Kevin: Yea, you should take it out as soon as possible. And also, Nate is bringing his girlfriend too.
     Henry: Nice, I'm really looking forward to seeing them again.
 '''
 summarizer(conversation)
