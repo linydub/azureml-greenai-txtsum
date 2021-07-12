@@ -1,11 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 experiment_name: samsum
-tags:
-    model: "bart-large"
-    seed: "1"
-    epoch: "3.0"
-    learning_rate: "5e-5"
-    batch_size: "128"
 code:
     local_path: ../../src
 command: >

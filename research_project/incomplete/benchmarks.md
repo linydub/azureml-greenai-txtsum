@@ -9,7 +9,7 @@ WIP!
 {env_table}
 
 ## Datasets Info
-Sample count and sequence length.
+Sample count and sequence length (BPE tokens).
 
 | Dataset | Train | Val | Test | Source (words/tokens) | Target (words/tokens) |
 | ------- | ----- | --- | ---- | :---: | :---: |

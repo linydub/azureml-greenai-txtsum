@@ -11,6 +11,10 @@ Good examples:
 Minor adjustments results in poor summarization:  
 Other bad examples:  
 
+## Increasing Efficiency
+- 
+- 
+
 ## Carbon Footprint vs Monetary Cost
 - Minimizing monetary cost does not always lead to a reduction in carbon emissions. Other factors mentioned like location.
 - Usually when minimizing cost on cloud computes, one would maximize the resource usage of the compute VMs.
@@ -26,8 +30,9 @@ Schedulers and optimizers, such as adafactor could reduce memory usage which ena
 ### Truncation
 When truncating, you should be aware of x tokenization and check sequence length distribution of source and target tokens. This will affect the accuracy.
 
-## Knowledge/Skill
+## Knowledge/Skills
 
 
 ## Future Research
 
+More experiments on power efficient training/fine-tuning
