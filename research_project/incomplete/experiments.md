@@ -1,6 +1,6 @@
 # Case Study: Evaluation of Cost Effective Strategies for Pretrained SOTA NLP Transformers on Supervised Abstractive Text Summarization
 
-WIP!
+WIP
 
 ### **Setup:**
 
