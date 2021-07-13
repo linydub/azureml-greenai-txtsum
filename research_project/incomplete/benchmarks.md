@@ -39,9 +39,9 @@ https://paperswithcode.com/paper/hierarchical-learning-for-generation-with/revie
 
 
 **Other Experiments:**
-- Parameter freezing (Freeze embedding modules,  Freeze encoder): Reduces GPU memory footprint, increases throughput, *affects accuracy
-- Sortish sampling: Reduces padding, GPU memory footprint, *reduces accuracy
-- Data Truncation: Reduces GPU memory footprint, reduces accuracy
+- Parameter freezing (embedding, encoder modules): Reduces GPU memory footprint, increases throughput, *affects accuracy
+- Sortish sampling: Reduces GPU memory usage, *reduces accuracy
+- Data Truncation (sequence length): Reduces GPU memory usage, reduces accuracy
 - Early stopping: Reduces runtime, *reduces accuracy
 
 ### Hyperparameters
