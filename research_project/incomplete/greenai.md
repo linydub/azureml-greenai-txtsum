@@ -24,11 +24,11 @@ Other bad examples:
 Tools such as AutoScale batch size and DeepSpeed memory estimator could help.
 
 ### Hyperparameter Tuning
-Hyperparameter tuning methods influence the cost, some common hyperparams to tune are learning rate, weight decay, label smoothing. Decoding includes number of beams, length penalty, max and min generation length.
+Hyperparameter tuning method, some common hyperparams to tune are learning rate, weight decay, label smoothing. Decoder params includes number of beams, length penalty, max and min generation length.
 Schedulers and optimizers, such as adafactor could reduce memory usage which enables training larger models or batch sizes.
 
 ### Truncation
-When truncating, you should be aware of x tokenization and check sequence length distribution of source and target tokens. This will affect the accuracy.
+type of tokenization method, sequence length distribution of source and target, this will affect the accuracy
 
 ## Knowledge/Skills
 
