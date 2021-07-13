@@ -1,14 +1,14 @@
 # Experiments
-WIP!
+WIP
 
-## Environment Info
+## Environment Details
 - Platform
-- Hardware
+- Hardware/SKU
 - 
 
 {env_table}
 
-## Datasets Info
+## Datasets Details
 Sample count and sequence length (BPE tokens).
 
 | Dataset | Train | Val | Test | Source (words/tokens) | Target (words/tokens) |
@@ -20,47 +20,44 @@ Sample count and sequence length (BPE tokens).
 Reference:
 https://paperswithcode.com/paper/hierarchical-learning-for-generation-with/review/?hl=30985  
 
-### SAMSum
+### SAMSum (Dialogue summarization)
 - SAMSum dataset similar to XSUM.
 - Used XSUM hyperparameters when fine-tuning.
 - 
 
-## Models Info
+## Models Details
 {model_tables}
 
-## Benchmarks
-- Scale: Bart-Large vs Bart-Base on SAMSum, XSUM
 
 ## Comparisons
-**Core:**  
-- ZeRO optimization: Reduces GPU memory footprint, increases speed
-- ZeRO offload/infinity (CPU): Reduces GPU memory footprint, speed trade-off
-- Population based tuning over grid search (Hyperparameter tuning): Less runtime per trial, increases accuracy
-- Floating point format (FP16- automatic mixed precision): Reduces , increases throughput
-- Sparse Attention Kernel: Reduces GPU memory footprint, higher GPU memory efficiency
-- 
+**Core Experiments:**  
+- ZeRO optimization: Reduces GPU memory usage, *increases speed
+- ZeRO offload/infinity (CPU): Reduces GPU memory usage, reduces speed
+- Population based tuning over grid search (Hyperparameter tuning): Less runtime & compute, *better accuracy
+- Floating point format (FP16- automatic mixed precision): Reduces GPU memory usage, increases speed
+- Sparse Attention Kernel: Reduces GPU memory usage, *affects accuracy
 
-**Other:**
-- Parameter freezing (Freeze embedding modules,  Freeze encoder): Reduces GPU memory footprint, increases throughput
-- Sortish sampling: Reduces padding, GPU memory footprint, accuracy trade-off
-- Data Truncation: Reduces GPU memory footprint, accuracy trade-off
-- Early stopping: Reduces runtime, accuracy trade-off
-- 
+
+**Other Experiments:**
+- Parameter freezing (Freeze embedding modules,  Freeze encoder): Reduces GPU memory footprint, increases throughput, *affects accuracy
+- Sortish sampling: Reduces padding, GPU memory footprint, *reduces accuracy
+- Data Truncation: Reduces GPU memory footprint, reduces accuracy
+- Early stopping: Reduces runtime, *reduces accuracy
 
 ### Hyperparameters
 - Batch size: Increase memory usage, increase speed
 - DS bucket sizes: Increase memory usage, increase speed
 - 
 
-## Trade-offs
-There are lots of combinations to experiment and tune with, x memory results in decreased accuracy but potentially worth the speed up. Other things could influence effectiveness or accuracy like the corpus and model scale.
+## Optimization Methods
+Some situational cases could have complex interactions between employed methods/parameters, other things could influence optimization method's effectiveness or task performance like the fine-tuning corpus and model size.
 
-Trade-offs and benefits:  
+Trade-offs:  
 {table}  
 Some experiment benchmark results:  
 {table}  
 
 ## Benchmark Results
-R-1/R-2/R-L  
-
-Reference:  
+- R-1/R-2/R-L 
+- Loss
+- Resource usage & carbon metrics
