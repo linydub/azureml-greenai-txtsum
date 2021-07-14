@@ -49,6 +49,8 @@ https://paperswithcode.com/paper/hierarchical-learning-for-generation-with/revie
 - DS bucket sizes: Increase memory usage, increase speed
 - 
 
+Applicable in general cases, some have trade-offs, asterisks prefix = situational, accuracy refers to task performance  
+
 ## Optimization Methods
 Some situational cases could have complex interactions between employed methods/parameters, other things could influence optimization method's effectiveness or task performance like the fine-tuning corpus and model size.
 
