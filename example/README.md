@@ -1,6 +1,8 @@
 # AzureML HuggingFace Fine-tune Example
 
-Task Overview  
+WIP  
+
+### Task Overview  
 
 Datasets Info  
 
@@ -13,8 +15,9 @@ Prerequisites
 
 Includes FairScale, DeepSpeed, CodeCarbon, MLflow integrations.  
 
+Adapted from: https://github.com/huggingface/transformers/blob/master/examples/pytorch/summarization/run_summarization.py  
 
-Extra Arguments:
+New Arguments:
 
 - Parameter freezing
 
@@ -37,4 +40,4 @@ Job Examples:
 
 
 
-*More benchmark details and comparisons in the HF model hub page(link) and benchmarks.md(link)
+*More benchmark details and comparisons in [HF model hub](https://huggingface.co/henryu-lin) and [benchmarks.md/experiments.md](https://github.com/henryu-lin/aml-txtsum/tree/main/research_project/incomplete)
