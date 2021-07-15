@@ -1,4 +1,4 @@
-# AzureML HuggingFace Fine-tune Example
+# AzureML 2.0 CLI HuggingFace Fine-tuning Example
 
 WIP  
 
@@ -11,7 +11,7 @@ Models Info
 
 Prerequisites  
 
-### Usage
+### Usage (PyTorch)
 
 Includes FairScale, DeepSpeed, CodeCarbon, MLflow integrations.  
 
@@ -20,13 +20,20 @@ Adapted from: https://github.com/huggingface/transformers/blob/master/examples/p
 New Arguments:
 
 - Parameter freezing
-
+```
+--freeze_embeds True
+--freeze_encoder True
+```
 - Early stopping
-
+```
+--train_early_stopping True
+--early_stopping_patience {int}
+--early_stopping_threshold {float}
+```
 
 Job Examples:
 
-- PyTorch
+- Pytorch distributed training
 
 - DeepSpeed
 
