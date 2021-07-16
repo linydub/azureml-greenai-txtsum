@@ -69,46 +69,6 @@ Reference dataset: SAMSum
     Result summary: 
 
 
-**Cost Savings:**
-
-Using several cost-efficient strategies validated from our experiments, we came down to a cost of ~$3.50 for fine-tuning Bart-Large on SAMSum dataset using 8 NVIDIA Tesla V100-GPU. Compared to Hugging Face’s distributed training setup on Amazon SageMaker, we have trained the model much faster and produced significantly better accuracy.
-
-(Training time could improve to sub ~3 minutes with a slight decrease in ROUGE-1 score (~54) with early stopping and further resource usage optimizations)
-
-Fine-tuning strategies employed: 
-
-Hyperparams: 
-
-[Distributed Training: Train BART/T5 for Summarization using 🤗 Transformers and Amazon SageMaker](https://huggingface.co/blog/sagemaker-distributed-training-seq2seq)
-
-“Converted to real money, our training on 16 NVIDIA Tesla V100-GPU for a State-of-the-Art summarization model comes down to ~28$.”
-
-**<span style="text-decoration:underline;">Microsoft AzureML</span>**
-
-Results: [https://huggingface.co/henryu-lin/bart-large-samsum](https://huggingface.co/henryu-lin/bart-large-samsum)
-
-ROUGE-1: 55.162
-
-Total training time: 9 minute 27 seconds
-
-Cost: ~$3.50 ($22.03/hr)
-
-**<span style="text-decoration:underline;">Amazon SageMaker</span>**
-
-Results: [https://huggingface.co/philschmid/bart-large-cnn-samsum](https://huggingface.co/philschmid/bart-large-cnn-samsum)
-
-ROUGE-1: 42.621
-
-Total training time: ~24 minutes
-
-Cost: ~$28
-
-**Benchmark Results:**
-
-[https://docs.google.com/spreadsheets/d/17Cyy-IK9vVTytv1nLq4VALEhJ_LEZ3McEHQRL_Pxsf0/edit#gid=0](https://docs.google.com/spreadsheets/d/17Cyy-IK9vVTytv1nLq4VALEhJ_LEZ3McEHQRL_Pxsf0/edit#gid=0)
-
-Demo: Text summarizer (interactive notebook using Gradio)
-
 **Training Tips:**
 
 
