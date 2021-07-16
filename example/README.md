@@ -47,4 +47,4 @@ Job Examples:
 
 
 
-*More benchmark details and comparisons in [HF model hub](https://huggingface.co/henryu-lin) and [benchmarks.md/experiments.md](https://github.com/henryu-lin/aml-txtsum/tree/main/research_project/incomplete)
+*More benchmark details and comparisons in [HF model hub](https://huggingface.co/henryu-lin) and [benchmarks.md/experiments.md](https://github.com/henryu-lin/aml-txtsum/tree/main/research_project)
