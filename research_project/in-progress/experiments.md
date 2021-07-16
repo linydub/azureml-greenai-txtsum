@@ -5,7 +5,7 @@ WIP
 ### **Setup:**
 
 We will be running our training experiments using the AzureML platform.  
-Compute cost on AzureML is calculated by the SKU hourly cost and training duration.  
+Compute cost on AzureML is calculated by the SKU hourly price and training duration.  
 
 AzureML SKU: ND40rs_v2 (NVIDIA V100 32GB x 8)  
 Reference model: Bart-Large  
@@ -87,9 +87,10 @@ Reference dataset: SAMSum
 
 -Pretrained model selection based on task/constraints. Testing/evaluation of initial pretrained models performances. Also evaluate deployment/inference (resource usage, latency, and costs) before inference optimizations.
 
--Hyperparameter tuning/search is often used and consumes a significant portion of training compute costs.
+-Hyperparameter tuning/search is often used and consumes a significant portion of training compute costs. Usually maximize batch size (and bucket size if using ZeRO optimization) then tune learning rate.  
+*Tools such as AutoScale batch size and DeepSpeed memory estimator could help.
 
-([[1804.00247] Training Tips for the Transformer Model](https://arxiv.org/abs/1804.00247)) Main hyperparameters to optimize are batch size and learning rate. Bigger batch size leads to better accuracy and faster training time, so the batch size should be maximized while leaving some memory to prevent hitting OOM. Batch size should be a power of 2 ([How big should my language model be ?](https://huggingface.co/calculator/)).
+([[1804.00247] Training Tips for the Transformer Model](https://arxiv.org/abs/1804.00247)) Main hyperparameters to optimize are batch size and learning rate. Bigger batch size leads to better accuracy and faster training time, so the batch size should be maximized while leaving some memory to prevent hitting OOM. Batch size should be a power of 2 ([How big should my language model be ?](https://huggingface.co/calculator/)). 
 
 -Evaluation/comparison of results for model selection.
 
@@ -110,17 +111,9 @@ Good examples:
 Minor adjustments results in poor summarization:  
 Other bad examples:  
 
-## Increasing Efficiency
-- 
-- 
-
 ## Carbon Footprint vs Monetary Cost
 - Minimizing monetary cost does not always lead to a reduction in carbon emissions
 - Usually when minimizing cost on cloud computes, one would maximize the resource usage of the compute VMs
-
-### Maximizing Memory Usage
-*Usually maximize batch size (and bucket size if using ZeRO optimizations) then tune learning rate.
-Tools such as AutoScale batch size and DeepSpeed memory estimator could help.
 
 ### Hyperparameter Tuning
 Hyperparameter tuning method, some common hyperparams to tune are learning rate, weight decay, label smoothing. Decoder params includes number of beams, length penalty, max and min generation length.
