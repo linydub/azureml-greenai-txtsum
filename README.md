@@ -42,7 +42,7 @@ Fine-tuning samples using AML 2.0 CLI could be found [here](./examples).
 
 ## Quickstart (ARM Templates)
 
-### AzureML Workspace Setup
+### Setup AzureML Workspace
 [![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhenryu%2Dlin%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2Fexample%2F%2Ecloud%2FazuredeployWorkspaceAssets%2Ejson)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/example/.cloud/azuredeployWorkspaceAssets.json)  
 
