@@ -26,8 +26,8 @@ from typing import Optional
 
 import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
-from transformers.integrations import MLflowCallback#, AzureMLCallback # edit
-from datasets import load_dataset, load_metric, load_from_disk # edit
+from transformers.integrations import MLflowCallback
+from datasets import load_dataset, load_metric, load_from_disk
 
 import transformers
 from filelock import FileLock
@@ -40,12 +40,11 @@ from transformers import (
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     set_seed,
-    EarlyStoppingCallback # edit
+    EarlyStoppingCallback
 )
 from transformers.file_utils import is_offline_mode
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
 from transformers.utils import check_min_version
-#from codecarbon import EmissionsTracker#, track_emissions # edit
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.7.0.dev0")
@@ -62,25 +61,16 @@ except (LookupError, OSError):
     with FileLock(".lock") as lock:
         nltk.download("punkt", quiet=True)
 
-# td args:
-# batch_size_autoscale https://github.com/BlackHC/toma
-# gradual_freezing_callback
-# pruning https://github.com/huggingface/nn_pruning
-# stf_distillation
-# summeval_metrics https://github.com/Yale-LILY/SummEval
-# codecarbon (enable_tracking, scope) -test overhead
-
-# edit
 @dataclass
 class ExtraArguments:
     """
-    Arguments pertaining to additional training/fine-tuning features/techniques.
+    Arguments pertaining to additional fine-tuning methods.
     """
 
     train_early_stopping: bool = field(
         default=False,
         metadata={
-            "help": "Whether to add EarlyStoppingCallback for finetuning. This callback depends on "
+            "help": "Whether to add EarlyStoppingCallback for training. This callback depends on "
             "`load_best_model_at_end` functionality to set best_metric in TrainerState."
         },
     )
@@ -147,9 +137,8 @@ class DataTrainingArguments:
     """
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
-    # edit: aml workspace/datastore dataset
     dataset_path: Optional[str] = field(
-        default=None, metadata={"help": "The path to the workspace dataset (AzureML)."}
+        default=None, metadata={"help": "The path to the dataset files."}
     )
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
@@ -285,13 +274,11 @@ summarization_name_mapping = {
 }
 
 
-#@track_emissions(project_name="carbon-total") # edit
 def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    # edit
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, ExtraArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
@@ -345,7 +332,6 @@ def main():
         transformers.utils.logging.set_verbosity_info()
     logger.info(f"Training/evaluation parameters {training_args}")
 
-    ### doesnt seem to work, inconsistent results
     # Set seed before initializing model.
     set_seed(training_args.seed)
 
@@ -355,13 +341,13 @@ def main():
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
 
-    # edit: load_dataset from data path
     if data_args.dataset_name is not None:
-        if data_args.dataset_path is not None:
-            datasets = load_from_disk(data_args.dataset_path)
-        else:
+        if data_args.dataset_path is None:
             # Downloading and loading a dataset from the hub.
             datasets = load_dataset(data_args.dataset_name, data_args.dataset_config_name, cache_dir=model_args.cache_dir)
+        else:
+            # Loading dataset from path instead.
+            datasets = load_from_disk(data_args.dataset_path)
     else:
         data_files = {}
         if data_args.train_file is not None:
@@ -516,7 +502,7 @@ def main():
             load_from_cache_file=not data_args.overwrite_cache,
         )
 
-    # Data collator (edit: dynamic padding)
+    # Data collator (/w dynamic padding)
     label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
     data_collator = DataCollatorForSeq2Seq(
         tokenizer,
@@ -560,13 +546,12 @@ def main():
         result = {k: round(v, 4) for k, v in result.items()}
         return result
 
-    # edit: param freezing from hf-legacy-seq2seq-utils
     def freeze_params(model):
         """Set requires_grad=False for each of model.parameters()"""
         for par in model.parameters():
             par.requires_grad = False
     def freeze_embeds(model):
-        """Freeze token embeddings and positional embeddings, just token embeddings for T5."""
+        """Freeze token embeddings and positional embeddings, just token embeddings for T5"""
         model_type = model.config.model_type
         if model_type in ["t5", "mt5"]:
             freeze_params(model.shared)
@@ -581,31 +566,11 @@ def main():
             for d in [model.model.encoder, model.model.decoder]:
                 freeze_params(d.embed_positions)
                 freeze_params(d.embed_tokens)
-    
-    """
-    def grad_status(model):
-        return (par.requires_grad for par in model.parameters())
-    def any_requires_grad(model):
-        return any(grad_status(model))
-    def assert_all_frozen(model):
-        model_grads = list(grad_status(model))
-        n_require_grad = sum(list(map(int, model_grads)))
-        npars = len(model_grads)
-        assert not any(model_grads), f"{n_require_grad/npars:.1%} of {npars} weights require grad"
-        logger.info(f"{n_require_grad/npars:.1%} of {npars} weights require grad")
-    def assert_not_all_frozen(model):
-        model_grads = list(grad_status(model))
-        npars = len(model_grads)
-        assert any(model_grads), f"none of {npars} weights require grad"
-        logger.info(f"none of {npars} weights require grad")
-    """
-    
-    # edit: embedding, encorder freezing
+
     if extra_args.freeze_embeds:
         freeze_embeds(model)
     if extra_args.freeze_encoder:
         freeze_params(model.get_encoder())
-        #assert_all_frozen(model.get_encoder())
     
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
@@ -618,11 +583,9 @@ def main():
         compute_metrics=compute_metrics if training_args.predict_with_generate else None
     )
 
-    # edit: removes aml mlflow step error
-    trainer.remove_callback(MLflowCallback)
-    #trainer.remove_callback(AzureMLCallback)
+    trainer.remove_callback(MLflowCallback) # Removes metric logging conflict with AzureML
     
-    # edit: training early stopping
+    # Training early stopping
     if extra_args.train_early_stopping:
         early_stopping = EarlyStoppingCallback(
             early_stopping_patience=extra_args.early_stopping_patience,
@@ -631,17 +594,6 @@ def main():
         trainer.add_callback(early_stopping)
         logger.info("Added EarlyStoppingCallback to trainer")
     
-    # edit td: tracker decorator
-    # enable, scope (entire_run/total, finetune, evaluate, predict)
-    """
-    # edit: tracking_scope(finetune)
-    @track_emissions(project_name="carbon-finetune", output_dir=training_args.output_dir)
-    def finetune(trainer, checkpoint):
-        results = trainer.train(resume_from_checkpoint=checkpoint)
-        logger.info(results.metrics)
-        return results.metrics
-    """
-    
     # Training
     if training_args.do_train:
         checkpoint = None
@@ -649,17 +601,8 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
-        
-        # edit: codecarbon
-        #tracker = EmissionsTracker(project_name="carbon-finetune", output_dir=training_args.output_dir)
-        #tracker.start()
-        
-        #train_result = finetune(trainer, checkpoint) # edit
+
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        
-        #emissions = tracker.stop() # edit
-        #logger.info(f"Finetune emissions: {emissions} CO₂eq (lbs)")
-        
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics

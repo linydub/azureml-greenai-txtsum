@@ -24,10 +24,10 @@ import sys
 from dataclasses import dataclass, field
 from typing import Optional
 
+import datasets
 import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
-from transformers.integrations import MLflowCallback#, AzureMLCallback # edit
-from datasets import load_dataset, load_metric, load_from_disk # edit
+from datasets import load_dataset, load_metric
 
 import transformers
 from filelock import FileLock
@@ -40,15 +40,17 @@ from transformers import (
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     set_seed,
-    EarlyStoppingCallback # edit
 )
 from transformers.file_utils import is_offline_mode
-from transformers.trainer_utils import get_last_checkpoint, is_main_process
+from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version
-#from codecarbon import EmissionsTracker#, track_emissions # edit
+from transformers.utils.versions import require_version
+
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.7.0.dev0")
+check_min_version("4.10.0.dev0")
+
+require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/summarization/requirements.txt")
 
 logger = logging.getLogger(__name__)
 
@@ -62,50 +64,6 @@ except (LookupError, OSError):
     with FileLock(".lock") as lock:
         nltk.download("punkt", quiet=True)
 
-# td args:
-# batch_size_autoscale https://github.com/BlackHC/toma
-# gradual_freezing_callback
-# pruning https://github.com/huggingface/nn_pruning
-# stf_distillation
-# summeval_metrics https://github.com/Yale-LILY/SummEval
-# codecarbon (enable_tracking, scope) -test overhead
-
-# edit
-@dataclass
-class ExtraArguments:
-    """
-    Arguments pertaining to additional training/fine-tuning features/techniques.
-    """
-
-    train_early_stopping: bool = field(
-        default=False,
-        metadata={
-            "help": "Whether to add EarlyStoppingCallback for finetuning. This callback depends on "
-            "`load_best_model_at_end` functionality to set best_metric in TrainerState."
-        },
-    )
-    early_stopping_patience: int = field(
-        default=1,
-        metadata={
-            "help": "Use with `metric_for_best_model` to stop training when the specified metric "
-            "worsens for `early_stopping_patience` evaluation calls."
-        },
-    )
-    early_stopping_threshold: Optional[float] = field(
-        default=0.0,
-        metadata={
-            "help": "Use with `metric_for_best_model` and `early_stopping_patience` to denote "
-            "how much the specified metric must improve to satisfy early stopping conditions."
-        },
-    )
-    freeze_embeds: bool = field(
-        default=False,
-        metadata={"help": "Whether to freeze the model's embedding modules."},
-    )
-    freeze_encoder: bool = field(
-        default=False,
-        metadata={"help": "Whether to freeze the model's encoder."},
-    )
 
 @dataclass
 class ModelArguments:
@@ -142,15 +100,13 @@ class ModelArguments:
         },
     )
 
+
 @dataclass
 class DataTrainingArguments:
     """
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
-    # edit: aml workspace/datastore dataset
-    dataset_path: Optional[str] = field(
-        default=None, metadata={"help": "The path to the workspace dataset (AzureML)."}
-    )
+
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
     )
@@ -270,6 +226,7 @@ class DataTrainingArguments:
         if self.val_max_target_length is None:
             self.val_max_target_length = self.max_target_length
 
+
 summarization_name_mapping = {
     "amazon_reviews_multi": ("review_body", "review_title"),
     "big_patent": ("description", "abstract"),
@@ -285,21 +242,39 @@ summarization_name_mapping = {
 }
 
 
-#@track_emissions(project_name="carbon-total") # edit
 def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    # edit
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, ExtraArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, training_args, extra_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
-        model_args, data_args, training_args, extra_args = parser.parse_args_into_dataclasses()
-    
+        model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    # Setup logging
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S",
+        handlers=[logging.StreamHandler(sys.stdout)],
+    )
+    log_level = training_args.get_process_log_level()
+    logger.setLevel(log_level)
+    datasets.utils.logging.set_verbosity(log_level)
+    transformers.utils.logging.set_verbosity(log_level)
+    transformers.utils.logging.enable_default_handler()
+    transformers.utils.logging.enable_explicit_format()
+
+    # Log on each process the small summary:
+    logger.warning(
+        f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
+        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
+    )
+    logger.info(f"Training/evaluation parameters {training_args}")
+
     if data_args.source_prefix is None and model_args.model_name_or_path in [
         "t5-small",
         "t5-base",
@@ -327,41 +302,23 @@ def main():
                 "the `--output_dir` or add `--overwrite_output_dir` to train from scratch."
             )
 
-    # Setup logging
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        handlers=[logging.StreamHandler(sys.stdout)],
-    )
-    logger.setLevel(logging.INFO if is_main_process(training_args.local_rank) else logging.WARN)
-
-    # Log on each process the small summary:
-    logger.warning(
-        f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
-    )
-    # Set the verbosity to info of the Transformers logger (on main process only):
-    if is_main_process(training_args.local_rank):
-        transformers.utils.logging.set_verbosity_info()
-    logger.info(f"Training/evaluation parameters {training_args}")
-
-    ### doesnt seem to work, inconsistent results
     # Set seed before initializing model.
     set_seed(training_args.seed)
 
+    # Get the datasets: you can either provide your own CSV/JSON training and evaluation files (see below)
+    # or just provide the name of one of the public datasets available on the hub at https://huggingface.co/datasets/
+    # (the dataset will be downloaded automatically from the datasets Hub).
+    #
     # For CSV/JSON files this script will use the first column for the full texts and the second column for the
     # summaries (unless you specify column names for this with the `text_column` and `summary_column` arguments).
     #
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
-
-    # edit: load_dataset from data path
     if data_args.dataset_name is not None:
-        if data_args.dataset_path is not None:
-            datasets = load_from_disk(data_args.dataset_path)
-        else:
-            # Downloading and loading a dataset from the hub.
-            datasets = load_dataset(data_args.dataset_name, data_args.dataset_config_name, cache_dir=model_args.cache_dir)
+        # Downloading and loading a dataset from the hub.
+        raw_datasets = load_dataset(
+            data_args.dataset_name, data_args.dataset_config_name, cache_dir=model_args.cache_dir
+        )
     else:
         data_files = {}
         if data_args.train_file is not None:
@@ -373,7 +330,7 @@ def main():
         if data_args.test_file is not None:
             data_files["test"] = data_args.test_file
             extension = data_args.test_file.split(".")[-1]
-        datasets = load_dataset(extension, data_files=data_files, cache_dir=model_args.cache_dir)
+        raw_datasets = load_dataset(extension, data_files=data_files, cache_dir=model_args.cache_dir)
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -414,11 +371,11 @@ def main():
     # Preprocessing the datasets.
     # We need to tokenize inputs and targets.
     if training_args.do_train:
-        column_names = datasets["train"].column_names
+        column_names = raw_datasets["train"].column_names
     elif training_args.do_eval:
-        column_names = datasets["validation"].column_names
+        column_names = raw_datasets["validation"].column_names
     elif training_args.do_predict:
-        column_names = datasets["test"].column_names
+        column_names = raw_datasets["test"].column_names
     else:
         logger.info("There is nothing to do. Please pass `do_train`, `do_eval` and/or `do_predict`.")
         return
@@ -473,50 +430,56 @@ def main():
         return model_inputs
 
     if training_args.do_train:
-        if "train" not in datasets:
+        if "train" not in raw_datasets:
             raise ValueError("--do_train requires a train dataset")
-        train_dataset = datasets["train"]
+        train_dataset = raw_datasets["train"]
         if data_args.max_train_samples is not None:
             train_dataset = train_dataset.select(range(data_args.max_train_samples))
-        train_dataset = train_dataset.map(
-            preprocess_function,
-            batched=True,
-            num_proc=data_args.preprocessing_num_workers,
-            remove_columns=column_names,
-            load_from_cache_file=not data_args.overwrite_cache,
-        )
+        with training_args.main_process_first(desc="train dataset map pre-processing"):
+            train_dataset = train_dataset.map(
+                preprocess_function,
+                batched=True,
+                num_proc=data_args.preprocessing_num_workers,
+                remove_columns=column_names,
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on train dataset",
+            )
 
     if training_args.do_eval:
         max_target_length = data_args.val_max_target_length
-        if "validation" not in datasets:
+        if "validation" not in raw_datasets:
             raise ValueError("--do_eval requires a validation dataset")
-        eval_dataset = datasets["validation"]
+        eval_dataset = raw_datasets["validation"]
         if data_args.max_eval_samples is not None:
             eval_dataset = eval_dataset.select(range(data_args.max_eval_samples))
-        eval_dataset = eval_dataset.map(
-            preprocess_function,
-            batched=True,
-            num_proc=data_args.preprocessing_num_workers,
-            remove_columns=column_names,
-            load_from_cache_file=not data_args.overwrite_cache,
-        )
+        with training_args.main_process_first(desc="validation dataset map pre-processing"):
+            eval_dataset = eval_dataset.map(
+                preprocess_function,
+                batched=True,
+                num_proc=data_args.preprocessing_num_workers,
+                remove_columns=column_names,
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on validation dataset",
+            )
 
     if training_args.do_predict:
         max_target_length = data_args.val_max_target_length
-        if "test" not in datasets:
+        if "test" not in raw_datasets:
             raise ValueError("--do_predict requires a test dataset")
-        predict_dataset = datasets["test"]
+        predict_dataset = raw_datasets["test"]
         if data_args.max_predict_samples is not None:
             predict_dataset = predict_dataset.select(range(data_args.max_predict_samples))
-        predict_dataset = predict_dataset.map(
-            preprocess_function,
-            batched=True,
-            num_proc=data_args.preprocessing_num_workers,
-            remove_columns=column_names,
-            load_from_cache_file=not data_args.overwrite_cache,
-        )
+        with training_args.main_process_first(desc="prediction dataset map pre-processing"):
+            predict_dataset = predict_dataset.map(
+                preprocess_function,
+                batched=True,
+                num_proc=data_args.preprocessing_num_workers,
+                remove_columns=column_names,
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on prediction dataset",
+            )
 
-    # Data collator (edit: dynamic padding)
+    # Data collator
     label_pad_token_id = -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
     data_collator = DataCollatorForSeq2Seq(
         tokenizer,
@@ -560,53 +523,6 @@ def main():
         result = {k: round(v, 4) for k, v in result.items()}
         return result
 
-    # edit: param freezing from hf-legacy-seq2seq-utils
-    def freeze_params(model):
-        """Set requires_grad=False for each of model.parameters()"""
-        for par in model.parameters():
-            par.requires_grad = False
-    def freeze_embeds(model):
-        """Freeze token embeddings and positional embeddings, just token embeddings for T5."""
-        model_type = model.config.model_type
-        if model_type in ["t5", "mt5"]:
-            freeze_params(model.shared)
-            for d in [model.encoder, model.decoder]:
-                freeze_params(d.embed_tokens)
-        elif model_type == "fsmt":
-            for d in [model.model.encoder, model.model.decoder]:
-                freeze_params(d.embed_positions)
-                freeze_params(d.embed_tokens)
-        else:
-            freeze_params(model.model.shared)
-            for d in [model.model.encoder, model.model.decoder]:
-                freeze_params(d.embed_positions)
-                freeze_params(d.embed_tokens)
-    
-    """
-    def grad_status(model):
-        return (par.requires_grad for par in model.parameters())
-    def any_requires_grad(model):
-        return any(grad_status(model))
-    def assert_all_frozen(model):
-        model_grads = list(grad_status(model))
-        n_require_grad = sum(list(map(int, model_grads)))
-        npars = len(model_grads)
-        assert not any(model_grads), f"{n_require_grad/npars:.1%} of {npars} weights require grad"
-        logger.info(f"{n_require_grad/npars:.1%} of {npars} weights require grad")
-    def assert_not_all_frozen(model):
-        model_grads = list(grad_status(model))
-        npars = len(model_grads)
-        assert any(model_grads), f"none of {npars} weights require grad"
-        logger.info(f"none of {npars} weights require grad")
-    """
-    
-    # edit: embedding, encorder freezing
-    if extra_args.freeze_embeds:
-        freeze_embeds(model)
-    if extra_args.freeze_encoder:
-        freeze_params(model.get_encoder())
-        #assert_all_frozen(model.get_encoder())
-    
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
@@ -615,33 +531,9 @@ def main():
         eval_dataset=eval_dataset if training_args.do_eval else None,
         tokenizer=tokenizer,
         data_collator=data_collator,
-        compute_metrics=compute_metrics if training_args.predict_with_generate else None
+        compute_metrics=compute_metrics if training_args.predict_with_generate else None,
     )
 
-    # edit: removes aml mlflow step error
-    trainer.remove_callback(MLflowCallback)
-    #trainer.remove_callback(AzureMLCallback)
-    
-    # edit: training early stopping
-    if extra_args.train_early_stopping:
-        early_stopping = EarlyStoppingCallback(
-            early_stopping_patience=extra_args.early_stopping_patience,
-            early_stopping_threshold=extra_args.early_stopping_threshold
-        )
-        trainer.add_callback(early_stopping)
-        logger.info("Added EarlyStoppingCallback to trainer")
-    
-    # edit td: tracker decorator
-    # enable, scope (entire_run/total, finetune, evaluate, predict)
-    """
-    # edit: tracking_scope(finetune)
-    @track_emissions(project_name="carbon-finetune", output_dir=training_args.output_dir)
-    def finetune(trainer, checkpoint):
-        results = trainer.train(resume_from_checkpoint=checkpoint)
-        logger.info(results.metrics)
-        return results.metrics
-    """
-    
     # Training
     if training_args.do_train:
         checkpoint = None
@@ -649,17 +541,7 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
-        
-        # edit: codecarbon
-        #tracker = EmissionsTracker(project_name="carbon-finetune", output_dir=training_args.output_dir)
-        #tracker.start()
-        
-        #train_result = finetune(trainer, checkpoint) # edit
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        
-        #emissions = tracker.stop() # edit
-        #logger.info(f"Finetune emissions: {emissions} CO₂eq (lbs)")
-        
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics
@@ -676,13 +558,10 @@ def main():
     results = {}
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
-        
-        metrics = trainer.evaluate(
-            max_length=data_args.val_max_target_length,
-            num_beams=data_args.num_beams,
-            metric_key_prefix="eval"
-        )
 
+        metrics = trainer.evaluate(
+            max_length=data_args.val_max_target_length, num_beams=data_args.num_beams, metric_key_prefix="eval"
+        )
         max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
         metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
 
@@ -691,14 +570,13 @@ def main():
 
     if training_args.do_predict:
         logger.info("*** Predict ***")
-        
+
         predict_results = trainer.predict(
             predict_dataset,
             metric_key_prefix="predict",
             max_length=data_args.val_max_target_length,
             num_beams=data_args.num_beams,
         )
-        
         metrics = predict_results.metrics
         max_predict_samples = (
             data_args.max_predict_samples if data_args.max_predict_samples is not None else len(predict_dataset)
@@ -719,7 +597,7 @@ def main():
                     writer.write("\n".join(predictions))
 
     if training_args.push_to_hub:
-        kwargs = {"finetuned_from": model_args.model_name_or_path, "tags": "summarization"}
+        kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "summarization"}
         if data_args.dataset_name is not None:
             kwargs["dataset_tags"] = data_args.dataset_name
             if data_args.dataset_config_name is not None:
@@ -729,9 +607,13 @@ def main():
                 kwargs["dataset"] = data_args.dataset_name
 
         trainer.push_to_hub(**kwargs)
-    
-    
+
     return results
+
+
+def _mp_fn(index):
+    # For xla_spawn (TPUs)
+    main()
 
 
 if __name__ == "__main__":

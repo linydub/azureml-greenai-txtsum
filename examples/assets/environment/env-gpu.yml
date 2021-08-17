@@ -1,0 +1,7 @@
+$schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
+name: hf-gpu
+version: 1
+docker:
+    build:
+        dockerfile: file:Dockerfile
+conda_file: file:conda.yml

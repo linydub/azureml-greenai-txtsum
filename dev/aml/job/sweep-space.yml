@@ -1,6 +1,3 @@
-cmd_args: >
-        --label_smoothing_factor {search_space.label_smoothing} 
-        --weight_decay {search_space.weight_decay} 
 search_space:
     seed_rand:
         type: randint

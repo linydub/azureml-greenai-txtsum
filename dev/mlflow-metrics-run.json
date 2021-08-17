@@ -1,0 +1,40 @@
+{
+    "info": {
+        "artifact_uri": "azureml://experiments/demo/runs/b8ad2ad7-ecf8-481f-948e-e94761eeec09/artifacts",
+        "end_time": 1625622778722,
+        "experiment_id": "f8593a08-9c99-4d97-bbc2-9a99fb9d85c6",
+        "lifecycle_stage": "active",
+        "run_id": "b8ad2ad7-ecf8-481f-948e-e94761eeec09",
+        "run_uuid": "b8ad2ad7-ecf8-481f-948e-e94761eeec09",
+        "start_time": 1625622452726,
+        "status": "FINISHED",
+        "user_id": "bcebe9dd-feef-4d42-88df-0fc3101b8f29"
+    },
+    "data": {
+        "metrics": {
+            "loss": 0.9752,
+            "learning_rate": 7.183908045977011e-07,
+            "epoch": 3.0,
+            "train_runtime": 203.4396,
+            "train_samples_per_second": 217.244,
+            "train_steps_per_second": 1.711,
+            "total_flos": 4.26008990669865e+16,
+            "train_loss": 1.2001634356619297,
+            "eval_loss": 1.4273128509521484,
+            "eval_rouge1": 55.2131,
+            "eval_rouge2": 30.0843,
+            "eval_rougeL": 45.343,
+            "eval_rougeLsum": 50.6611,
+            "eval_gen_len": 30.8704,
+            "eval_runtime": 26.1953,
+            "eval_samples_per_second": 31.227,
+            "eval_steps_per_second": 0.267
+        },
+        "params": {},
+        "tags": {
+            "_aml_system_ComputeTargetStatus": "{\"AllocationState\":\"steady\",\"PreparingNodeCount\":0,\"RunningNodeCount\":1,\"CurrentNodeCount\":1}",
+            "mlflow.source.type": "JOB",
+            "mlflow.source.name": ""
+        }
+    }
+}

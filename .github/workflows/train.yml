@@ -1,0 +1,9 @@
+name: Placeholder
+on:
+  schedule:
+  - cron: '0 20 * * 5'
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ github.repository }}."

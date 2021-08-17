@@ -4,6 +4,9 @@ desktop.ini
 # Jupyter notebook checkpoints
 .ipynb_checkpoints
 
+# VSCode
+.vscode
+
 # AML
 *.amlignore
 *.amltmp 

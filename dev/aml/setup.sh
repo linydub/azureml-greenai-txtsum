@@ -6,7 +6,7 @@ az extension add --source https://azuremlsdktestpypi.blob.core.windows.net/wheel
 export AZURE_ML_CLI_PRIVATE_FEATURES_ENABLED="true"
 
 az login
-az account set -s 6560575d-fa06-4e7d-95fb-f962e74efd7a
+az account set -s {string}
 az configure --defaults group="UW-Embeddings" workspace="TxtSum" location="westus2"
 
 az ml environment create --file ./env/hf-env.yml

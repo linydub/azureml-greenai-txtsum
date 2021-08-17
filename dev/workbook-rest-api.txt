@@ -1,0 +1,22 @@
+/subscriptions/6560575d-fa06-4e7d-95fb-f962e74efd7a/resourceGroups/UW-Embeddings/providers/Microsoft.Storage/storageAccounts/txtsumstorage?api-version=2021-06-01
+
+/subscriptions/6560575d-fa06-4e7d-95fb-f962e74efd7a/resourceGroups/UW-Embeddings/providers/Microsoft.MachineLearningServices/workspaces/TxtSum/datastores/txtsumstorage_azureml?api-version=2021-03-01-preview
+
+/subscriptions/6560575d-fa06-4e7d-95fb-f962e74efd7a/resourceGroups/UW-Embeddings/providers/Microsoft.MachineLearningServices/workspaces/TxtSum?api-version=2021-03-01-preview
+
+/history/v1.0/subscriptions/6560575d-fa06-4e7d-95fb-f962e74efd7a/resourceGroups/UW-Embeddings/providers/Microsoft.MachineLearningServices/workspaces/TxtSum/experimentids/f8593a08-9c99-4d97-bbc2-9a99fb9d85c6/runs/b8ad2ad7-ecf8-481f-948e-e94761eeec09
+
+expid: f8593a08-9c99-4d97-bbc2-9a99fb9d85c6
+runid: b8ad2ad7-ecf8-481f-948e-e94761eeec09
+
+azureml://westus2.experiments.azureml.net/mlflow/v1.0/subscriptions/6560575d-fa06-4e7d-95fb-f962e74efd7a/resourceGroups/uw-embeddings/providers/Microsoft.MachineLearningServices/workspaces/txtsum?
+
+azureml://westus2.api.azureml.ms/mlflow/v1.0/subscriptions/6560575d-fa06-4e7d-95fb-f962e74efd7a/resourceGroups/UW-Embeddings/providers/Microsoft.MachineLearningServices/workspaces/TxtSum
+
+# header
+Authorization: "Bearer <YOUR-ACCESS-TOKEN>"
+
+/api/2.0/preview/mlflow/experiments/list
+
+# hf-metrics
+GET https://txtsumstorage.blob.core.windows.net/azureml/ExperimentRun/dcid.b8ad2ad7-ecf8-481f-948e-e94761eeec09/outputs/all_results.json
