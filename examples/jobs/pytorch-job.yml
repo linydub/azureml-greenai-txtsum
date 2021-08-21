@@ -4,7 +4,7 @@ code:
 command: >
     python main.py 
     --model_name_or_path "facebook/bart-large" 
-    --config_name "./configs/bart-xsum-config.json" 
+    --config_name "./configs/hf-bart-xsum.json" 
     --dataset_name "samsum" 
     --dataset_path {inputs.corpus} 
     --max_source_length 512 
@@ -16,6 +16,7 @@ command: >
     --gradient_accumulation_steps 1 
     --learning_rate 5e-5 
     --num_train_epochs 3.0 
+    --weight_decay 0.1 
     --evaluation_strategy "epoch" 
     --logging_strategy "epoch" 
     --do_train 
@@ -37,4 +38,4 @@ distribution:
     type: pytorch
     process_count: 8
 experiment_name: hf-pytorch-demo
-description: Finetune an encoder-decoder Transformer (BART) for dialogue summarization (SAMSum) with Hugging Face (PyTorch).
+description: Finetune an encoder-decoder Transformer (BART) for dialogue summarization (SAMSum) with HuggingFace (PyTorch).

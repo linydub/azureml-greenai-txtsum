@@ -23,7 +23,6 @@ search_space:
     label_smoothing:
         type: choice
         values: [0.0, 0.1]
-
     freeze_embeds:
         type: choice
         values: [0, 1]

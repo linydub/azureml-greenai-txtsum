@@ -1,7 +1,7 @@
 type: command_component
 
-name: hf-trainer
-display_name: HuggingFace Trainer
+name: hf-finetune
+display_name: HuggingFace Finetune
 version: 1
 
 inputs:
@@ -15,9 +15,9 @@ outputs:
         type: path
 
 code:
-    local_path: ../../exp
+    local_path: ../../src
 
-environment: azureml:hf-base:latest
+environment: azureml:hf-base:1
 
 command: >
     python trainer-wip.py 

@@ -5,9 +5,10 @@ trial:
     code: 
         local_path: src
     command: >
-        python trainer-wip.py 
+        python -m torch.distributed.launch 
+        --nproc_per_node 8 main.py 
         --model_name_or_path "facebook/bart-large" 
-        --config_name "./configs/bart-xsum-config.json" 
+        --config_name "./configs/hf-bart-xsum.json" 
         --dataset_name "samsum" 
         --dataset_path {inputs.corpus} 
         --max_source_length 512 
@@ -37,9 +38,6 @@ trial:
     compute:
         target: azureml:gpu-v100-8-lp
         instance_count: 1
-    distribution:
-        type: pytorch
-        process_count: 8
 search_space:
     lr:
         type: choice
@@ -48,10 +46,10 @@ search_space:
         type: choice
         values: [0.0, 0.1]
 objective:
-    primary_metric: eval_loss
-    goal: minimize
+    primary_metric: eval_rouge1
+    goal: maximize
 max_total_trials: 4
 max_concurrent_trials: 1
-timeout_minutes: 900
+timeout_minutes: 60
 experiment_name: hf-sweep-demo
 description: Hyperparameter tune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with a grid search sweep job.

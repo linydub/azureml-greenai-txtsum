@@ -27,7 +27,7 @@ from typing import Optional
 import datasets
 import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
-from datasets import load_dataset, load_metric
+from datasets import load_dataset, load_metric, load_from_disk
 
 import transformers
 from filelock import FileLock
@@ -40,6 +40,7 @@ from transformers import (
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     set_seed,
+    EarlyStoppingCallback
 )
 from transformers.file_utils import is_offline_mode
 from transformers.trainer_utils import get_last_checkpoint
@@ -64,6 +65,41 @@ except (LookupError, OSError):
     with FileLock(".lock") as lock:
         nltk.download("punkt", quiet=True)
 
+@dataclass
+class ExtraArguments:
+    """
+    Arguments pertaining to additional fine-tuning methods.
+    """
+
+    train_early_stopping: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to add EarlyStoppingCallback for training. This callback depends on "
+            "`load_best_model_at_end` functionality to set best_metric in TrainerState."
+        },
+    )
+    early_stopping_patience: int = field(
+        default=1,
+        metadata={
+            "help": "Use with `metric_for_best_model` to stop training when the specified metric "
+            "worsens for `early_stopping_patience` evaluation calls."
+        },
+    )
+    early_stopping_threshold: Optional[float] = field(
+        default=0.0,
+        metadata={
+            "help": "Use with `metric_for_best_model` and `early_stopping_patience` to denote "
+            "how much the specified metric must improve to satisfy early stopping conditions."
+        },
+    )
+    freeze_embeds: bool = field(
+        default=False,
+        metadata={"help": "Whether to freeze the model's embedding modules."},
+    )
+    freeze_encoder: bool = field(
+        default=False,
+        metadata={"help": "Whether to freeze the model's encoder."},
+    )
 
 @dataclass
 class ModelArguments:
@@ -107,6 +143,9 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
 
+    dataset_path: Optional[str] = field(
+        default=None, metadata={"help": "The path to the dataset files."}
+    )
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
     )
@@ -247,13 +286,13 @@ def main():
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
 
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments, ExtraArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, data_args, training_args, extra_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
-        model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+        model_args, data_args, training_args, extra_args = parser.parse_args_into_dataclasses()
 
     # Setup logging
     logging.basicConfig(
@@ -315,10 +354,14 @@ def main():
     # In distributed training, the load_dataset function guarantee that only one local process can concurrently
     # download the dataset.
     if data_args.dataset_name is not None:
-        # Downloading and loading a dataset from the hub.
-        raw_datasets = load_dataset(
-            data_args.dataset_name, data_args.dataset_config_name, cache_dir=model_args.cache_dir
-        )
+        if data_args.dataset_path is None:
+            # Downloading and loading a dataset from the hub.
+            raw_datasets = load_dataset(
+                data_args.dataset_name, data_args.dataset_config_name, cache_dir=model_args.cache_dir
+            )
+        else:
+            # Loading dataset from disk instead.
+            raw_datasets = load_from_disk(data_args.dataset_path)
     else:
         data_files = {}
         if data_args.train_file is not None:
@@ -523,6 +566,32 @@ def main():
         result = {k: round(v, 4) for k, v in result.items()}
         return result
 
+    def freeze_params(model):
+        """Set requires_grad=False for each of model.parameters()"""
+        for par in model.parameters():
+            par.requires_grad = False
+    def freeze_embeds(model):
+        """Freeze token embeddings and positional embeddings, just token embeddings for T5"""
+        model_type = model.config.model_type
+        if model_type in ["t5", "mt5"]:
+            freeze_params(model.shared)
+            for d in [model.encoder, model.decoder]:
+                freeze_params(d.embed_tokens)
+        elif model_type == "fsmt":
+            for d in [model.model.encoder, model.model.decoder]:
+                freeze_params(d.embed_positions)
+                freeze_params(d.embed_tokens)
+        else:
+            freeze_params(model.model.shared)
+            for d in [model.model.encoder, model.model.decoder]:
+                freeze_params(d.embed_positions)
+                freeze_params(d.embed_tokens)
+
+    if extra_args.freeze_embeds:
+        freeze_embeds(model)
+    if extra_args.freeze_encoder:
+        freeze_params(model.get_encoder())
+
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
@@ -533,6 +602,14 @@ def main():
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
     )
+
+    # Training early stopping
+    if extra_args.train_early_stopping:
+        early_stopping = EarlyStoppingCallback(
+            early_stopping_patience=extra_args.early_stopping_patience,
+            early_stopping_threshold=extra_args.early_stopping_threshold
+        )
+        trainer.add_callback(early_stopping)
 
     # Training
     if training_args.do_train:

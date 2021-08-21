@@ -1,12 +1,3 @@
----
-page_type: sample
-languages:
-- azurecli
-products:
-- azure-machine-learning
-description: Directory for Azure Machine Learning CLI sample code.
----
-
 # AzureML 2.0 CLI HuggingFace Fine-tuning Examples
 
 ## Prerequisites
@@ -37,13 +28,13 @@ bash create-assets.sh
 ## Examples
 Run the example defined through the job's YAML specification:
 ```
-az ml job create --file ./jobs/pytorch-job.yml
+az ml job create --file ./jobs/pytorch-job.yml --web --stream
 ```
 Job | Status | Description
 --- | ------ | -----------
-[jobs/pytorch-job.yml](jobs/pytorch-job.yml)|[![placeholder](https://img.shields.io/badge/job-placeholder-d52f2f.svg)](./jobs)|Finetune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with HuggingFace (PyTorch).
-[jobs/deepspeed-job.yml](jobs/deepspeed-job.yml)|[![placeholder](https://img.shields.io/badge/job-placeholder-d52f2f.svg)](./jobs)|Finetune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with HuggingFace's DeepSpeed integration.
-[jobs/sweep-job.yml](jobs/sweep-job.yml)|[![placeholder](https://img.shields.io/badge/job-placeholder-d52f2f.svg)](./jobs)|Hyperparameter tune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with a grid search sweep job.
+[jobs/pytorch-job.yml](jobs/pytorch-job.yml)|[![placeholder](https://img.shields.io/badge/%20Job%20-placeholder-33cc4c.svg)](./jobs)|Finetune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with HuggingFace (PyTorch).
+[jobs/deepspeed-job.yml](jobs/deepspeed-job.yml)|[![placeholder](https://img.shields.io/badge/%20Job%20-placeholder-33cc4c.svg)](./jobs)|Finetune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with HuggingFace's DeepSpeed integration.
+[jobs/sweep-job.yml](jobs/sweep-job.yml)|[![placeholder](https://img.shields.io/badge/%20Job%20-placeholder-33cc4c.svg)](./jobs)|Hyperparameter tune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with a grid search sweep job.
 
 ## Script usage (PyTorch)
 [`jobs/src/main.py`](jobs/src/main.py) could be adapted or replaced with another script (e.g. [`run_glue.py`](https://github.com/huggingface/transformers/blob/master/examples/pytorch/text-classification/run_glue.py)) to fine-tune models for other NLP tasks.
