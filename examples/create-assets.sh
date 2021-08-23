@@ -1,4 +1,4 @@
-az ml environment create --file ./assets/environment/env-gpu.yml
+az ml environment create --file ./assets/environment/hf-zero-gpu.yml
 
 az ml data create --file ./assets/data/samsum-local.yml
 

@@ -1,0 +1,41 @@
+name: docker
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - examples/assets/environment/**
+    - .github/workflows/docker.yml
+  schedule:
+  - cron: '0 0 * * 5'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      docker_environment: public/azureml/hf-gpu
+      acr_url: ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: oprypin/find-latest-tag@v1
+      with:
+        repository: txtsum/hf-gpu
+        releases-only: false
+      id: tag
+
+    - name: Build the tagged Docker image
+      run: docker build . --file environments/Dockerfile --tag hf-gpu
+
+    - name: Login to ACR
+      run: echo "${{ secrets.ACR_PASSWORD }}" | docker login $acr_url --username ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    - name: Push Docker image
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo *.azurecr.io/$docker_environment:${{ steps.tag.outputs.tag }}
+        docker tag hf-gpu $acr_url/$docker_environment:${{ steps.tag.outputs.tag }}
+        docker tag hf-gpu $acr_url/$docker_environment:latest
+        docker push $acr_url/$docker_environment:${{ steps.tag.outputs.tag }}
+        docker push $acr_url/$docker_environment:latest
+    - name: Log out of ACR
+      run: docker logout $acr_url

@@ -3,7 +3,7 @@
 
 FROM mcr.microsoft.com/azureml/o16n-base/python-assets:20210428.36856618 AS inferencing-assets
 
-# Tag: cuda:11.0.3-devel-ubuntu18.04
+# Tag: cuda:11.1.1-devel-ubuntu18.04
 # Env: CUDA_VERSION=11.1.1
 # Env: NCCL_VERSION=2.8.4
 # Env: CUDNN_VERSION=8.0.5.39

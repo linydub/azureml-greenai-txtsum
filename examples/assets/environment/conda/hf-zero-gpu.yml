@@ -1,11 +1,11 @@
-name: hf-conda
+name: hf-zero
 channels:
   - pytorch
   - nvidia
   - conda-forge
 dependencies:
   - python=3.8
-  - pytorch=1.8.1
+  - pytorch=1.9.0
   - cudatoolkit=11.1
   - pip
   - pip:
@@ -19,6 +19,6 @@ dependencies:
     - rouge-score
     - mlflow
     - azureml-mlflow
+    - codecarbon
     - fairscale
     - deepspeed
-    - codecarbon

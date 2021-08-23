@@ -34,7 +34,7 @@ trial:
         corpus:
             data: azureml:hf-samsum:1
             mode: download
-    environment: azureml:hf-gpu:1
+    environment: azureml:hf-zero-gpu:1
     compute:
         target: azureml:gpu-v100-8-lp
         instance_count: 1

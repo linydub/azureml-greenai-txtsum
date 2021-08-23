@@ -62,23 +62,23 @@
       "type": "string",
       "defaultValue": "1"
     },
-    "environmentDockerfile": {
+    "environmentDockerImageUri": {
       "type": "string",
-      "defaultValue": "# Copyright (c) Microsoft Corporation. All rights reserved.\n# Licensed under the MIT License.\n\nFROM mcr.microsoft.com/azureml/o16n-base/python-assets:20210428.36856618 AS inferencing-assets\n\n# Tag: cuda:11.0.3-devel-ubuntu18.04\n# Env: CUDA_VERSION=11.1.1\n# Env: NCCL_VERSION=2.8.4\n# Env: CUDNN_VERSION=8.0.5.39\n\nFROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04\n\nUSER root:root\n\nENV com.nvidia.cuda.version $CUDA_VERSION\nENV com.nvidia.volumes.needed nvidia_driver\nENV LANG=C.UTF-8 LC_ALL=C.UTF-8\nENV DEBIAN_FRONTEND noninteractive\nENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64\nENV NCCL_DEBUG=INFO\nENV HOROVOD_GPU_ALLREDUCE=NCCL\n\n# Install Common Dependencies\nRUN apt-get update && \\\n    apt-get install -y --no-install-recommends \\\n    # SSH and RDMA\n    libmlx4-1 \\\n    libmlx5-1 \\\n    librdmacm1 \\\n    libibverbs1 \\\n    libmthca1 \\\n    libdapl2 \\\n    dapl2-utils \\\n    openssh-client \\\n    openssh-server \\\n    redis \\\n    iproute2 && \\\n    # Others\n    apt-get install -y \\\n    build-essential \\\n    bzip2 \\\n    libbz2-1.0 \\\n    systemd \\\n    git \\\n    wget \\\n    cpio \\\n    pciutils \\\n    libnuma-dev \\\n    ibutils \\\n    ibverbs-utils \\ \n    rdmacm-utils \\\n    infiniband-diags \\\n    perftest \\\n    librdmacm-dev \\\n    libibverbs-dev \\\n    libsm6 \\\n    libxext6 \\\n    libxrender-dev \\\n    libssl1.0.0 \\\n    linux-image-aws \\ \n    linux-image-azure \\ \n    linux-image-generic \\\n    linux-image-kvm \\\n    linux-image-lowlatency \\\n    linux-image-virtual \\\n    linux-image-gke \\\n    linux-image-oem \\\n    slapd \\\n    perl \\ \n    ca-certificates \\\n    apt \\\n    p11-kit \\\n    libp11-kit0 \\\n    tar \\\n    libzstd1 \\\n    libglib2.0-0 \\\n    libnettle6 \\\n    fuse && \\\n    apt-get clean -y && \\\n    rm -rf /var/lib/apt/lists/*\n\n# Inference\n# Copy logging utilities, nginx and rsyslog configuration files, IOT server binary, etc.\nCOPY --from=inferencing-assets /artifacts /var/\nRUN /var/requirements/install_system_requirements.sh && \\\n    cp /var/configuration/rsyslog.conf /etc/rsyslog.conf && \\\n    cp /var/configuration/nginx.conf /etc/nginx/sites-available/app && \\\n    ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/app && \\\n    rm -f /etc/nginx/sites-enabled/default\nENV SVDIR=/var/runit\nENV WORKER_TIMEOUT=300\nEXPOSE 5001 8883 8888\n\n# Conda Environment\nENV MINICONDA_VERSION py37_4.9.2\nENV PATH /opt/miniconda/bin:$PATH\nRUN wget -qO /tmp/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \\\n    bash /tmp/miniconda.sh -bf -p /opt/miniconda && \\\n    conda clean -ay && \\\n    rm -rf /opt/miniconda/pkgs && \\\n    rm /tmp/miniconda.sh && \\\n    find / -type d -name __pycache__ | xargs rm -rf\n\n# Open-MPI-UCX installation\nRUN mkdir /tmp/ucx && \\\n    cd /tmp/ucx && \\\n\twget -q https://github.com/openucx/ucx/releases/download/v1.6.1-rc2/ucx-1.6.1.tar.gz && \\\n\ttar zxf ucx-1.6.1.tar.gz && \\\n\tcd ucx-1.6.1 && \\\n\t./configure --prefix=/usr/local --enable-optimizations --disable-assertions --disable-params-check --enable-mt && \\\n\tmake -j $(nproc --all) && \\\n\tmake install && \\\n\trm -rf /tmp/ucx\n\n# Open-MPI installation\nENV OPENMPI_VERSION 4.1.0\nRUN mkdir /tmp/openmpi && \\\n    cd /tmp/openmpi && \\\n    wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-${OPENMPI_VERSION}.tar.gz && \\\n    tar zxf openmpi-${OPENMPI_VERSION}.tar.gz && \\\n    cd openmpi-${OPENMPI_VERSION} && \\\n    ./configure --with-ucx=/usr/local/ --enable-mca-no-build=btl-uct --enable-orterun-prefix-by-default && \\\n    make -j $(nproc) all && \\\n    make install && \\\n    ldconfig && \\\n    rm -rf /tmp/openmpi\t\n\t\n# Msodbcsql17 installation\nRUN apt-get update && \\\n    apt-get install -y curl && \\\n    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \\\n    curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list && \\\n    apt-get update && \\\n    ACCEPT_EULA=Y apt-get install -y msodbcsql17\n\n#Cmake Installation\nRUN apt-get update && \\\n    apt-get install -y cmake",
+      "defaultValue": "mcr.microsoft.com/azureml/openmpi4.1.0-cuda11.1-cudnn8-ubuntu18.04:latest",
       "metadata": {
-        "description": "Docker command line instructions to assemble an image."
+        "description": "Image name of a custom base image."
       }
     },
     "environmentCondaFile": {
       "type": "string",
-      "defaultValue": "{\n  \"channels\": [\n    \"pytorch\",\n    \"nvidia\",\n    \"conda-forge\"\n  ],\n  \"dependencies\": [\n    \"python=3.8\",\n    \"pytorch=1.8.1\",\n    \"cudatoolkit=11.1\",\n    \"pip\",\n    {\n      \"pip\": [\n        \"numpy\",\n        \"nltk\",\n        \"protobuf\",\n        \"py7zr\",\n        \"sentencepiece\",\n        \"datasets\",\n        \"git+https://github.com/huggingface/transformers\",\n        \"rouge-score\",\n        \"mlflow\",\n        \"azureml-mlflow\",\n        \"fairscale\",\n        \"deepspeed\",\n        \"codecarbon\"\n      ]\n    }\n  ],\n  \"name\": \"azureml_601445831ecbb633fa034000577e4525\"\n}",
+      "defaultValue": "{\n  \"channels\": [\n    \"pytorch\",\n    \"nvidia\",\n    \"conda-forge\"\n  ],\n  \"dependencies\": [\n    \"python=3.8\",\n    \"pytorch=1.9.0\",\n    \"cudatoolkit=11.1\",\n    \"pip\",\n    {\n      \"pip\": [\n        \"numpy\",\n        \"nltk\",\n        \"protobuf\",\n        \"py7zr\",\n        \"sentencepiece\",\n        \"datasets\",\n        \"git+https://github.com/huggingface/transformers\",\n        \"rouge-score\",\n        \"mlflow\",\n        \"azureml-mlflow\",\n        \"codecarbon\",\n        \"deepspeed\",\n        \"fairscale\"\n      ]\n    }\n  ],\n  \"name\": \"hf-zero-gpu\"\n}",
       "metadata": {
         "description": "Standard configuration file used by Conda that lets you install any kind of package, including Python, R, and C/C++ packages."
       }
     },
     "environmentName": {
       "type": "string",
-      "defaultValue": "hf-gpu",
+      "defaultValue": "hf-zero-gpu",
       "metadata": {
         "description": "The name of environment asset."
       }
@@ -120,7 +120,10 @@
     "environmentVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', parameters('workspaceName'), parameters('environmentName'), parameters('environmentVersion'))]",
     "codeVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', parameters('workspaceName'), parameters('codeName'), parameters('codeVersion'))]",
     "computeResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', parameters('workspaceName'), parameters('computeName'))]",
-    "storageAccountName": "[concat(toLower(parameters('workspaceName')), 'sa')]",
+    "storageAccountName": "[concat(toLower(parameters('workspaceName')), 'storage')]",
+    "keyVaultName": "[concat(toLower(parameters('workspaceName')), 'keyvault')]",
+    "applicationInsightsName": "[concat(toLower(parameters('workspaceName')), 'insights')]",
+    "containerRegistryName": "[concat(toLower(parameters('workspaceName')), 'registry')]",
     "datastoreName": "demo-assets",
     "container": {
       "name": "aml-uploads",
@@ -128,6 +131,42 @@
     }
   },
   "resources": [
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2020-11-01-preview",
+      "name": "[variables('containerRegistryName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+          "name": "basic"
+      },
+      "properties": {
+          "adminUserEnabled": true
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2019-09-01",
+      "name": "[variables('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "accessPolicies": []
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      }
+    },
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-02-01",
@@ -168,14 +207,20 @@
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[variables('storageAccountName')]"
+        "[variables('storageAccountName')]",
+        "[variables('applicationInsightsName')]",
+        "[variables('keyVaultName')]",
+        "[variables('containerRegistryName')]"
       ],
       "identity": {
         "type": "systemAssigned"
       },
       "properties": {
         "friendlyName": "[parameters('workspaceName')]",
-        "storageAccount": "[resourceId('Microsoft.Storage/storageAccount', variables('storageAccountName'))]"
+        "storageAccount": "[resourceId('Microsoft.Storage/storageAccount', variables('storageAccountName'))]",
+        "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
+        "containerRegistry": "[resourceId('Microsoft.Insights/components', variables('containerRegistryName'))]"
       },
       "resources": [
         {
@@ -266,8 +311,8 @@
           "platform": {
               "operatingSystemType": "Linux"
           },
-          "dockerSpecificationType": "Build",
-          "dockerfile": "[parameters('environmentDockerfile')]"
+          "dockerSpecificationType": "Image",
+          "dockerImageUri": "[parameters('environmentDockerImageUri')]"
         },
         "condaFile": "[parameters('environmentCondaFile')]"
       }

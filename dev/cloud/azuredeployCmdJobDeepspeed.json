@@ -44,16 +44,16 @@
         "description": " Virtual Machine priority - Dedicated, LowPriority."
       }
     },
-    "dsConfigUrl": {
+    "deepspeedConfigUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/config/ds-zero2.json",
+      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/src/config/ds-zero2.json",
       "metadata": {
         "description": "Link to the DeepSpeed JSON configuration file."
       }
     },
     "codeUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/main.py",
+      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/src/main.py",
       "metadata": {
         "description": "Link to the training script."
       }
@@ -125,7 +125,11 @@
     "container": {
       "name": "aml-uploads",
       "path": "src"
-    }
+    },
+    "uploadFiles": {
+      "path": ["src", "src/configs"],
+      "content": ["[parameters('codeUrl')]", "[parameters('deepspeedConfigUrl')]"]
+    } 
   },
   "resources": [
     {
@@ -224,7 +228,7 @@
     {
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "2020-10-01",
-      "name": "UploadConfig",
+      "name": "UploadCodeConfig",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[variables('storageAccountName')]",
@@ -233,7 +237,7 @@
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.15.0",
-        "arguments": "[concat(parameters('dsConfigUrl'), ' ', variables('container').name, ' ', variables('container').path, ' ', variables('storageAccountName'))]",
+        "arguments": "[concat(parameters('deepspeedConfigUrl'), ' ', variables('container').name, ' ', variables('container').path, ' ', variables('storageAccountName'))]",
         "scriptContent": "wget $1; downloadfilename=$(basename $1); az storage blob upload -f $downloadfilename -c $2/$3/configs --account-name $4 -n $downloadfilename",
         "timeout": "PT30M",
         "cleanupPreference": "Always",

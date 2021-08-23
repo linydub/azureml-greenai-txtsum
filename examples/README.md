@@ -58,7 +58,8 @@ Job | Status | Description
 | Directory | Description |
 | --------- | ----------- |
 | [`assets`](./assets) | Example workspace assets |
-| [`jobs`](./jobs) | Example scripts for sample tasks |
+| [`jobs`](./jobs) | Example jobs for sample tasks |
+| [`jobs/src`](./jobs/src) | Example training script and configs |
 
 ## Reference
 AzureML:

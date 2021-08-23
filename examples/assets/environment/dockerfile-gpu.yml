@@ -4,4 +4,4 @@ version: 1
 docker:
     build:
         dockerfile: file:Dockerfile
-conda_file: file:conda.yml
+conda_file: file:conda/hf-zero.yml
