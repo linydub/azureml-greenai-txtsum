@@ -38,9 +38,6 @@ All logged training metrics are automatically reported to AzureML and MLflow. Co
 
 **Sample script for retrieving and aggregating MLflow and resource usage data will be available next update.*
 
-## AzureML 2.0 CLI Examples
-Fine-tuning samples using AML 2.0 CLI could be found [here](./examples).
-
 ## Quickstart (ARM Templates)
 
 ### Fine-tune a HuggingFace Model
@@ -51,6 +48,9 @@ Fine-tuning samples using AML 2.0 CLI could be found [here](./examples).
 
 ### Hyperparameter Sweep with HyperDrive
 [![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhenryu%2Dlin%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeploySweepJob%2Ejson)
+
+## AzureML 2.0 CLI Examples
+Fine-tuning samples using AML 2.0 CLI could be found [here](./examples).
 
 ## Jupyter Notebooks
 | Notebook | Description |

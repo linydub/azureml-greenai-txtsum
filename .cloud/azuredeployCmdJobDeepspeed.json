@@ -61,7 +61,7 @@
     },
     "codeName": {
       "type": "string",
-      "defaultValue": "hf-txtsum",
+      "defaultValue": "hf-txtsum-deepspeed",
       "metadata": {
         "description": "The name of code asset."
       }
@@ -97,7 +97,7 @@
     },
     "jobCommand": {
       "type": "string",
-      "defaultValue": "deepspeed main.py --deepspeed './configs/ds-zero2.json' --model_name_or_path 'facebook/bart-large-xsum' --dataset_name 'samsum' --max_source_length 512 --max_target_length 90 --fp16 True --seed 1 --per_device_train_batch_size 16 --per_device_eval_batch_size 16 --learning_rate 5e-5 --weight_decay 0.1 --evaluation_strategy 'epoch' --logging_strategy 'epoch' --do_train --do_predict --predict_with_generate --overwrite_output_dir --output_dir './outputs' --logging_dir './logs' --ddp_find_unused_parameters False\n",
+      "defaultValue": "deepspeed main.py --deepspeed './configs/ds-zero2.json' --model_name_or_path 'facebook/bart-large-xsum' --dataset_name 'samsum' --max_source_length 512 --max_target_length 90 --fp16 True --seed 1 --per_device_train_batch_size 16 --per_device_eval_batch_size 16 --learning_rate 5e-5 --weight_decay 0.1 --evaluation_strategy 'epoch' --logging_strategy 'epoch' --do_train --do_predict --predict_with_generate --overwrite_output_dir --output_dir './outputs' --logging_dir './logs'\n",
       "metadata": {
         "description": "The command to execute on startup of the job. eg. \"python train.py\""
       }
@@ -126,7 +126,7 @@
     "codeVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', parameters('workspaceName'), parameters('codeName'), parameters('codeVersion'))]",
     "computeResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', parameters('workspaceName'), parameters('computeName'))]",
     "datastoreId": "[resourceId('Microsoft.MachineLearningServices/workspaces/datastores', parameters('workspaceName'), 'workspaceblobstore')]",
-    "uploadPath" : "DemoUploads/src"
+    "uploadPath" : "[concat('DemoUploads/codes/', parameters('codeName'), '/v', parameters('codeVersion'))]"
   },
   "resources": [
     {
@@ -288,7 +288,8 @@
       "apiVersion": "2021-03-01-preview",
       "dependsOn": [
         "[parameters('workspaceName')]",
-        "TxtsumUploadCode"
+        "TxtsumUploadCode",
+        "TxtsumUploadConfig"
       ],
       "properties": {
         "datastoreId": "[variables('datastoreId')]",

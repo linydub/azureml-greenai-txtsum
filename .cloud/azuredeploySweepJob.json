@@ -160,7 +160,7 @@
     "codeVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', parameters('workspaceName'), parameters('codeName'), parameters('codeVersion'))]",
     "computeResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', parameters('workspaceName'), parameters('computeName'))]",
     "datastoreId": "[resourceId('Microsoft.MachineLearningServices/workspaces/datastores', parameters('workspaceName'), 'workspaceblobstore')]",
-    "uploadPath" : "DemoUploads/src"
+    "uploadPath" : "[concat('DemoUploads/codes/', parameters('codeName'), '/v', parameters('codeVersion'))]"
   },
   "resources": [
     {
