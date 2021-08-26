@@ -4,7 +4,7 @@ on:
     branches:
     - main
     paths:
-    - examples/assets/environment/**
+    - examples/assets/environment/Dockerfile
     - .github/workflows/docker.yml
   schedule:
   - cron: '0 0 * * 5'

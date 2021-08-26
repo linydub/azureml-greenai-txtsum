@@ -1,5 +1,5 @@
 # Microsoft GreenAI: NLP Text Summarization (preview)
-[![ARM Template](https://img.shields.io/badge/ARM%20Template-placeholder-eb3030.svg)](./README.md#quickstart-arm-templates) [![Docker](https://img.shields.io/badge/Docker-placeholder-33cc4c.svg)](./examples/assets/environment/Dockerfile) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![ARM Template](https://img.shields.io/badge/ARM%20Template-placeholder-33cc4c.svg)](./README.md#quickstart-arm-templates) [![Docker](https://img.shields.io/badge/Docker-placeholder-33cc4c.svg)](./examples/assets/environment/Dockerfile) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 <p align="center">
   <img src="research-project/images/azureml-icon.png" alt="azureml icon" height="80"/>
@@ -10,11 +10,11 @@
 This repo currently contains samples to fine-tune [HuggingFace models](https://huggingface.co/models) for text summarization using [Microsoft's Azure Machine Learning service](https://azure.microsoft.com/en-us/services/machine-learning-service/). These samples could be adapted to fine-tune models for other NLP tasks or product scenarios.
 
 ### What's available now?
-* **[New]** AzureML 2.0 CLI examples for fine-tuning HuggingFace models
+* **[New]** Quickstart ARM Templates for fine-tuning HuggingFace models
+* AzureML 2.0 CLI examples for fine-tuning HuggingFace models
 * HuggingFace example models & fine-tuning results: https://huggingface.co/henryu-lin
 
 ### What's coming next?
-* ARM Templates for fine-tuning HuggingFace models
 * Benchmarking and carbon accounting with MLflow and Azure Monitor Metrics (performance + resource metrics)
 * Interactive data visualization example with Azure Monitor Workbook
 * Fine-tuning benchmark results (model comparisons)

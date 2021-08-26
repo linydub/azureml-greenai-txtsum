@@ -36,7 +36,7 @@ trial:
             mode: download
     environment: azureml:hf-zero-gpu:1
     compute:
-        target: azureml:gpu-v100-8-lp
+        target: azureml:gpu-v100-8
         instance_count: 1
 search_space:
     lr:

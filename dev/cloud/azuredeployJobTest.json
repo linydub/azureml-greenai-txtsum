@@ -18,7 +18,7 @@
     },
     "computeName": {
       "type": "string",
-      "defaultValue": "gpu-v100-8",
+      "defaultValue": "gpu-v100-8-lp",
       "metadata": {
         "description": "Specifies the name of the Azure Machine Learning Compute cluster."
       }
@@ -39,17 +39,9 @@
     },
     "computePriority": {
       "type": "string",
-      "defaultValue": "Dedicated",
-      "allowedValues": [ "Dedicated", "LowPriority"],
+      "defaultValue": "LowPriority",
       "metadata": {
-        "description": " Virtual machine priority."
-      }
-    },
-    "codeUrl": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/main.py",
-      "metadata": {
-        "description": "Link to the training script."
+        "description": " Virtual Machine priority - Dedicated, LowPriority."
       }
     },
     "deepspeedConfigUrl": {
@@ -57,6 +49,13 @@
       "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/configs/ds-zero2.json",
       "metadata": {
         "description": "Link to the DeepSpeed JSON configuration file."
+      }
+    },
+    "codeUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/main.py",
+      "metadata": {
+        "description": "Link to the training script."
       }
     },
     "codeName": {
@@ -102,31 +101,53 @@
         "description": "The command to execute on startup of the job. eg. \"python train.py\""
       }
     },
+    "jobProcessCount": {
+      "type": "int",
+      "defaultValue": 8,
+      "metadata": {
+        "description": "Total process count for the distributed job."
+      }
+    },
     "jobName": {
       "type": "string",
-      "defaultValue": "bart-samsum-deepspeed",
+      "defaultValue": "cmd-job-pytorch",
       "metadata": {
         "description": "The name and identifier for the Job."
       }
     },
     "experimentName": {
       "type": "string",
-      "defaultValue": "hf-deepspeed-demo",
+      "defaultValue": "hf-pytorch-demo",
       "metadata": {
         "description": "The name of the experiment the job belongs to."
       }
     }
   },
   "variables": {
-    "storageAccountName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'storage')]",
-    "keyVaultName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'keyvault')]",
-    "applicationInsightsName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'insights')]",
-    "containerRegistryName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'registry')]",
+    "storageAccountName": "[concat(toLower(parameters('workspaceName')), 'storage')]",
+    "keyVaultName": "[concat(toLower(parameters('workspaceName')), 'keyvault')]",
+    "applicationInsightsName": "[concat(toLower(parameters('workspaceName')), 'insights')]",
+    "containerRegistryName": "[concat(toLower(parameters('workspaceName')), 'registry')]",
     "environmentVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', parameters('workspaceName'), parameters('environmentName'), parameters('environmentVersion'))]",
     "codeVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', parameters('workspaceName'), parameters('codeName'), parameters('codeVersion'))]",
     "computeResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', parameters('workspaceName'), parameters('computeName'))]",
     "datastoreId": "[resourceId('Microsoft.MachineLearningServices/workspaces/datastores', parameters('workspaceName'), 'workspaceblobstore')]",
-    "uploadPath" : "DemoUploads/src"
+    "uploadPath" : "DemoUploads/src",
+    "uploadAssets": {
+      "path": ["src", "src/configs"],
+      "content": ["[parameters('codeUrl')]", "[parameters('deepspeedConfigUrl')]"]
+    },
+    "copy": [
+      {
+        "name": "uploadFiles",
+        "count": 2,
+        "input": {
+          "name": "[concat('DemoUploads', '/', copyIndex('uploadFiles'))]",
+          "path": "src",
+          "content": ""
+        }
+      }
+    ]
   },
   "resources": [
     {
@@ -227,7 +248,7 @@
               "scaleSettings": {
                 "minNodeCount": 0,
                 "maxNodeCount": "[parameters('computeNodes')]",
-                "nodeIdleTimeBeforeScaleDown": "PT2M"
+                "nodeIdleTimeBeforeScaleDown": "PT5M"
               }
             }
           }
@@ -237,10 +258,11 @@
     {
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "2020-10-01",
-      "name": "TxtsumUploadCode",
+      "name": "TxtsumUploadFiles",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[parameters('workspaceName')]"
+        "[parameters('workspaceName')]",
+        "[variables('storageAccountName')]"
       ],
       "kind": "AzureCLI",
       "properties": {
@@ -255,31 +277,14 @@
         "scriptContent": "wget $1; downloadfilename=$(basename $1); az storage blob upload -f $downloadfilename -c $2/$3 --account-name $4 -n $downloadfilename",
         "timeout": "PT30M",
         "cleanupPreference": "OnSuccess",
-        "retentionInterval": "P1D"
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deploymentScripts",
-      "apiVersion": "2020-10-01",
-      "name": "TxtsumUploadConfig",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[parameters('workspaceName')]"
-      ],
-      "kind": "AzureCLI",
-      "properties": {
-        "azCliVersion": "2.15.0",
-        "environmentVariables": [
+        "retentionInterval": "P1D",
+        "copy": [
           {
-            "name": "AZURE_STORAGE_KEY",
-            "secureValue": "[listKeys(resourceID('Microsoft.MachineLearningServices/workspaces', parameters('workspaceName')), '2021-04-01').userStorageKey]"
+            "name": "name",
+            "count": 2,
+            "input": ""
           }
-        ],
-        "arguments": "[concat(parameters('deepspeedConfigUrl'), ' ', reference(variables('datastoreId'), '2021-03-01-preview').contents.containerName, ' ', variables('uploadPath'), ' ', variables('storageAccountName'))]",
-        "scriptContent": "wget $1; downloadfilename=$(basename $1); az storage blob upload -f $downloadfilename -c $2/$3/configs --account-name $4 -n $downloadfilename",
-        "timeout": "PT30M",
-        "cleanupPreference": "OnSuccess",
-        "retentionInterval": "P1D"
+        ]
       }
     },
     {
@@ -288,7 +293,7 @@
       "apiVersion": "2021-03-01-preview",
       "dependsOn": [
         "[parameters('workspaceName')]",
-        "TxtsumUploadCode"
+        "TxtsumUploadFiles"
       ],
       "properties": {
         "datastoreId": "[variables('datastoreId')]",
@@ -330,6 +335,10 @@
         "compute": {
           "instanceCount": "[parameters('computeNodes')]",
           "target": "[variables('computeResourceId')]"
+        },
+        "distribution": {
+          "distributionType": "PyTorch",
+          "processCount": "[parameters('jobProcessCount')]"
         },
         "environmentId": "[variables('environmentVersionResourceId')]",
         "experimentName": "[parameters('experimentName')]",
