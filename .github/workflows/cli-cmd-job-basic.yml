@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 jobs:
   fine-tune:
-    runs-on: [self-hosted, Standard_DS1_v2]
+    runs-on: [self-hosted]
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v2
