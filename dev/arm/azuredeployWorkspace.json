@@ -4,7 +4,7 @@
   "parameters": {
     "workspaceName": {
       "type": "string",
-      "defaultValue": "TxtsumDemo",
+      "defaultValue": "TxtsumDev",
       "metadata": {
         "description": "Specifies the name of the Azure Machine Learning workspace."
       }
@@ -18,49 +18,44 @@
     },
     "storageAccountName": {
       "type": "string",
-      "defaultValue": "[concat(toLower(parameters('workspaceName')), 'sa')]",
+      "defaultValue": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'storage')]",
       "metadata": {
-        "description": "The name for the storage account to created and associated with the workspace."
+        "description": "The name of the storage account to be created and associated with the workspace."
       }
     },
     "keyVaultName": {
       "type": "string",
-      "defaultValue": "[concat(toLower(parameters('workspaceName')), 'kv')]",
+      "defaultValue": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'keyvault')]",
       "metadata": {
-        "description": "The name for the key vault to created and associated with the workspace."
+        "description": "The name of the key vault to be created and associated with the workspace."
       }
     },
     "applicationInsightsName": {
       "type": "string",
-      "defaultValue": "[concat(toLower(parameters('workspaceName')), 'ai')]",
+      "defaultValue": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'insights')]",
       "metadata": {
-        "description": "The name for the application insights to created and associated with the workspace."
+        "description": "The name of the application insights to be created and associated with the workspace."
+      }
+    },
+    "containerRegistryName": {
+      "type": "string",
+      "defaultValue": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'registry')]",
+      "metadata": {
+        "description": "The name of the container registry to be created and associated with the workspace."
       }
     }
   },
   "resources": [
     {
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2019-06-01",
-      "name": "[parameters('storageAccountName')]",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2020-11-01-preview",
+      "name": "[parameters('containerRegistryName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "Standard_LRS"
+          "name": "basic"
       },
-      "kind": "StorageV2",
       "properties": {
-        "encryption": {
-          "services": {
-            "blob": {
-              "enabled": true
-            },
-            "file": {
-              "enabled": true
-            }
-          },
-          "keySource": "Microsoft.Storage"
-        },
-        "supportsHttpsTrafficOnly": true
+          "adminUserEnabled": true
       }
     },
     {
@@ -88,14 +83,39 @@
       }
     },
     {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-02-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": true
+            },
+            "file": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
       "type": "Microsoft.MachineLearningServices/workspaces",
-      "apiVersion": "2020-03-01",
+      "apiVersion": "2021-04-01",
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
+        "[parameters('storageAccountName')]",
         "[parameters('applicationInsightsName')]",
         "[parameters('keyVaultName')]",
-        "[parameters('storageAccountName')]"
+        "[parameters('containerRegistryName')]"
       ],
       "identity": {
         "type": "systemAssigned"
@@ -104,7 +124,8 @@
         "friendlyName": "[parameters('workspaceName')]",
         "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
         "keyVault": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-        "applicationInsights": "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+        "applicationInsights": "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]",
+        "containerRegistry": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
       }
     }
   ],

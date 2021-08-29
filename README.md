@@ -1,5 +1,5 @@
 # Microsoft GreenAI: NLP Text Summarization (preview)
-[![ARM Template](https://img.shields.io/badge/ARM%20Template-placeholder-33cc4c.svg)](./README.md#quickstart-arm-templates) [![Docker](https://img.shields.io/badge/Docker-placeholder-33cc4c.svg)](./examples/assets/environment/Dockerfile) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![ARM Quickstart](../../actions/workflows/arm-cmd-job-pytorch.yml/badge.svg)](../../actions/workflows/arm-cmd-job-pytorch.yml) [![CLI Job](../../actions/workflows/cli-cmd-job-basic.yml/badge.svg)](../../actions/workflows/cli-cmd-job-basic.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 <p align="center">
   <img src="research-project/images/azureml-icon.png" alt="azureml icon" height="80"/>
@@ -17,11 +17,12 @@ This repo currently contains samples to fine-tune [HuggingFace models](https://h
 ### What's coming next?
 * Benchmarking and carbon accounting with MLflow and Azure Monitor Metrics (performance + resource metrics)
 * Interactive data visualization example with Azure Monitor Workbook
-* Fine-tuning benchmark results (model comparisons)
 * Documentation and guide for the fine-tuning samples
+* Fine-tuning benchmark results (comparison experiments)
 
 ### Future steps
-* AML 2.0 CLI inference samples with ONNX Runtime and NVIDIA Triton (deployment)
+* AML 2.0 CLI inference samples with ONNX Runtime and NVIDIA Triton (AML endpoints & deployments)
+* AML 2.0 CLI end-to-end pipeline samples
 
 ## Contents
 | Directory | Description |
@@ -38,16 +39,19 @@ All logged training metrics are automatically reported to AzureML and MLflow. Co
 
 **Sample script for retrieving and aggregating MLflow and resource usage data will be available next update.*
 
-## Quickstart (ARM Templates)
+## Quickstart
 
 ### Fine-tune a HuggingFace Model
-[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhenryu%2Dlin%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeployCmdJobPytorch%2Ejson)
+[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Flinydub%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeployCmdJobPytorch%2Ejson)
+[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https://raw.githubusercontent.com/linydub/azureml-greenai-txtsum/main/.cloud/azuredeployCmdJobPytorch.json)
 
 ### Fine-tune with DeepSpeed ZeRO Optimizations
-[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhenryu%2Dlin%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeployCmdJobDeepspeed%2Ejson)
+[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Flinydub%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeployCmdJobDeepspeed%2Ejson)
 
 ### Hyperparameter Sweep with HyperDrive
-[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhenryu%2Dlin%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeploySweepJob%2Ejson)
+[![Deploy to Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Flinydub%2Fazureml%2Dgreenai%2Dtxtsum%2Fmain%2F%2Ecloud%2FazuredeploySweepJob%2Ejson)
+
+More advanced ARM Templates will be available [here](./.cloud).
 
 ## AzureML 2.0 CLI Examples
 Fine-tuning samples using AML 2.0 CLI could be found [here](./examples).

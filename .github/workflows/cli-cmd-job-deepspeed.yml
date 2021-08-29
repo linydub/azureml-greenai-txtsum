@@ -1,4 +1,4 @@
-name: CLI Pytorch Job
+name: CLI DeepSpeed Job
 on:
   schedule:
     - cron: '0 20 * * 5'
@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - examples/jobs/pytorch-job.yml
-      - .github/workflows/cli-cmd-job-pytorch.yml
+      - examples/jobs/deepspeed-job.yml
+      - .github/workflows/cli-cmd-job-deepspeed.yml
   workflow_dispatch:
 jobs:
   fine-tune:
@@ -23,7 +23,7 @@ jobs:
       
     - name: Create ML job
       run: |
-        run_id=$(az ml job create -f jobs/pytorch-job.yml --query name -o tsv)
+        run_id=$(az ml job create -f jobs/deepspeed-job.yml --query name -o tsv)
         az ml job stream -n $run_id
         status=$(az ml job show -n $run_id --query status -o tsv)
         echo $status

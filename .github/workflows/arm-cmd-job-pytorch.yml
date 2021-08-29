@@ -1,4 +1,4 @@
-name: arm-cmd-job-pytorch
+name: ARM Quickstart
 on:
   push:
     branches:
@@ -6,21 +6,15 @@ on:
     paths:
       - ".github/workflows/arm-cmd-job-pytorch.yml"
       - ".cloud/azuredeployCmdJobPytorch.json"
+  workflow_dispatch:
 jobs:
-  train-on-azure:
-    runs-on: ubuntu-latest
+  fine-tune:
+    runs-on: [self-hosted]
     steps:
       - name: Checkout repo code
         uses: actions/checkout@v2
-
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{secrets.AZURE_CREDENTIALS}}
-
-      - name: Deploy ARM Template
-      - uses: azure/arm-deploy@v1
-        with:
-          resourceGroupName: UW-Embeddings
-          template: ./.cloud/azuredeployCmdJobPytorch.json
-          parameters: ./.cloud/azuredeployCmdJobPytorch.parameters.json
+        
+      - name: Deploy ARM template
+        run: |
+          az deployment group create --resource-group ${{secrets.AZURE_RESOURCE_GROUP}} --template-file ./azuredeployCmdJobPytorch.json --parameters workspaceName='${{secrets.AZUREML_WORKSPACE}}'
+        working-directory: .cloud

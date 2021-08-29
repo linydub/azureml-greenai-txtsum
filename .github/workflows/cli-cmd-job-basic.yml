@@ -1,17 +1,17 @@
-name: CLI Pytorch Job
+name: CLI Job
 on:
   schedule:
-    - cron: '0 20 * * 5'
+    - cron: '0 18 * * *'
   push:
     branches:
       - main
     paths:
-      - examples/jobs/pytorch-job.yml
-      - .github/workflows/cli-cmd-job-pytorch.yml
+      - examples/jobs/basic-job.yml
+      - .github/workflows/cli-cmd-job-basic.yml
   workflow_dispatch:
 jobs:
   fine-tune:
-    runs-on: [self-hosted]
+    runs-on: [self-hosted, Standard_DS1_v2]
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v2
@@ -23,7 +23,7 @@ jobs:
       
     - name: Create ML job
       run: |
-        run_id=$(az ml job create -f jobs/pytorch-job.yml --query name -o tsv)
+        run_id=$(az ml job create -f jobs/basic-job.yml --query name -o tsv)
         az ml job stream -n $run_id
         status=$(az ml job show -n $run_id --query status -o tsv)
         echo $status

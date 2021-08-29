@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus2"
+        },
+        "workspaceName": {
+            "value": "TxtsumDemo"
+        },
+        "resourceGroupName": {
+            "value": "UW-Embeddings"
+        },
+        "sku": {
+            "value": "Basic"
+        },
+        "tagValues": {
+            "value": {}
+        },
+        "keyVaultName": {
+            "value": "txtsumkeys"
+        },
+        "storageAccountName": {
+            "value": "txtsumstorage"
+        },
+        "applicationInsightsName": {
+            "value": "txtsuminsights"
+        },
+        "storageAccountOption": {
+            "value": "existing"
+        },
+        "storageAccountLocation": {
+            "value": "westus2"
+        },
+        "storageAccountType": {
+            "value": "Standard_LRS"
+        },
+        "storageAccountHnsEnabled": {
+            "value": false
+        },
+        "storageAccountResourceGroupName": {
+            "value": "UW-Embeddings"
+        },
+        "keyVaultOption": {
+            "value": "existing"
+        },
+        "keyVaultLocation": {
+            "value": "westus2"
+        },
+        "keyVaultResourceGroupName": {
+            "value": "UW-Embeddings"
+        },
+        "applicationInsightsOption": {
+            "value": "existing"
+        },
+        "applicationInsightsLocation": {
+            "value": "westus2"
+        },
+        "applicationInsightsResourceGroupName": {
+            "value": "UW-Embeddings"
+        },
+        "containerRegistryOption": {
+            "value": "existing"
+        },
+        "containerRegistryName": {
+            "value": "txtsumcontainers"
+        },
+        "containerRegistrySku": {
+            "value": "Standard"
+        },
+        "containerRegistryLocation": {
+            "value": "westus2"
+        },
+        "containerRegistryResourceGroupName": {
+            "value": "UW-Embeddings"
+        },
+        "identityType": {
+            "value": "systemAssigned"
+        }
+    }
+}
