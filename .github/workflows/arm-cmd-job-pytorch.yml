@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Checkout repo code
         uses: actions/checkout@v2
-        
+
       - name: Deploy ARM template
         run: |
-          az deployment group create --resource-group ${{secrets.AZURE_RESOURCE_GROUP}} --template-file ./azuredeployCmdJobPytorch.json --parameters workspaceName='${{secrets.AZUREML_WORKSPACE}}' jobName='${{GITHUB_RUN_ID}}'
+          az deployment group create --resource-group ${{secrets.AZURE_RESOURCE_GROUP}} --template-file ./azuredeployCmdJobPytorch.json --parameters workspaceName='${{secrets.AZUREML_WORKSPACE}}' jobName='${{github.RUN_ID}}'
         working-directory: .cloud
