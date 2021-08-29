@@ -1,8 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/compute.schema.json
-name: gpu-v100-4
+name: gpu-k80-2
 type: amlcompute
 priority: Dedicated
-size: Standard_NC6s_v3
+size: Standard_NC12
 min_instances: 0
-max_instances: 2
+max_instances: 4
 idle_time_before_scale_down: 120

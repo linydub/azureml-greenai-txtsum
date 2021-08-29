@@ -1,1 +1,1 @@
-az ml job create --file ./jobs/pytorch-job.yml --web --stream
+az ml job create --file ./jobs/pytorch-job.yml --stream

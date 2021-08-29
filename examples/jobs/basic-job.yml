@@ -1,0 +1,26 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code:
+    local_path: src
+command: >
+    python main.py 
+    --model_name_or_path "facebook/bart-base" 
+    --dataset_name "samsum" 
+    --max_source_length 512 
+    --max_target_length 90 
+    --seed 1 
+    --per_device_train_batch_size 1 
+    --per_device_eval_batch_size 1 
+    --max_eval_samples 10 
+    --max_predict_samples 10 
+    --max_steps 10 
+    --do_train 
+    --do_eval
+    --overwrite_output_dir 
+    --output_dir "./outputs" 
+    --logging_dir "./logs" 
+    --ddp_find_unused_parameters False
+environment: azureml:hf-zero-gpu:1
+compute:
+    target: azureml:gpu-k80
+    instance_count: 1
+experiment_name: hf-test

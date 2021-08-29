@@ -1,3 +1,5 @@
+az extension remove -n azure-cli-ml
+
 az extension add -n ml -y
 
 az group create --name "AML-GreenAI" --location "westus2"

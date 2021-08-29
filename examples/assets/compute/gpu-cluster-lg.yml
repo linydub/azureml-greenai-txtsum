@@ -1,9 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/compute.schema.json
-name: gpu-v100-8-lp
-type: AmlCompute
-priority: LowPriority
+name: gpu-v100-8
+type: amlcompute
+priority: Dedicated
 size: Standard_ND40rs_v2
-
 min_instances: 0
 max_instances: 1
-idle_time_before_scale_down: 300
+idle_time_before_scale_down: 120
