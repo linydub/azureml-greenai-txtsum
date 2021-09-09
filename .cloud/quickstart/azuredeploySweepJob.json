@@ -1,0 +1,368 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "type": "string",
+      "defaultValue": "TxtsumDemo",
+      "metadata": {
+        "description": "Specifies the name of the Azure Machine Learning Workspace which will contain these assets."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westus2",
+      "metadata": {
+        "description": "Specifies the location for all resources."
+      }
+    },
+    "computeName": {
+      "type": "string",
+      "defaultValue": "gpu-v100-8",
+      "metadata": {
+        "description": "Specifies the name of the Azure Machine Learning Compute cluster."
+      }
+    },
+    "computeSize": {
+      "type": "string",
+      "defaultValue": "Standard_ND40rs_v2",
+      "metadata": {
+        "description": " The size of agent VMs. More details can be found here: https://aka.ms/azureml-vm-details."
+      }
+    },
+    "computeNodes": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": " The number of nodes to use per trial on the cluster."
+      }
+    },
+    "computePriority": {
+      "type": "string",
+      "defaultValue": "Dedicated",
+      "allowedValues": [ "Dedicated", "LowPriority"],
+      "metadata": {
+        "description": " Virtual machine priority."
+      }
+    },
+    "codeUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/main.py",
+      "metadata": {
+        "description": "Link to the training script."
+      }
+    },
+    "codeName": {
+      "type": "string",
+      "defaultValue": "hf-txtsum",
+      "metadata": {
+        "description": "The name of code asset."
+      }
+    },
+    "codeVersion": {
+      "type": "string",
+      "defaultValue": "1"
+    },
+    "environmentDockerImageUri": {
+      "type": "string",
+      "defaultValue": "mcr.microsoft.com/azureml/openmpi4.1.0-cuda11.1-cudnn8-ubuntu18.04:latest",
+      "metadata": {
+        "description": "Image name of a custom base image."
+      }
+    },
+    "environmentCondaFile": {
+      "type": "string",
+      "defaultValue": "{\n  \"channels\": [\n    \"pytorch\",\n    \"nvidia\",\n    \"conda-forge\"\n  ],\n  \"dependencies\": [\n    \"python=3.8\",\n    \"pytorch=1.9.0\",\n    \"cudatoolkit=11.1\",\n    \"pip\",\n    {\n      \"pip\": [\n        \"numpy\",\n        \"nltk\",\n        \"protobuf\",\n        \"py7zr\",\n        \"sentencepiece\",\n        \"datasets\",\n        \"git+https://github.com/huggingface/transformers\",\n        \"rouge-score\",\n        \"mlflow\",\n        \"azureml-mlflow\",\n        \"codecarbon\",\n        \"deepspeed\",\n        \"fairscale\"\n      ]\n    }\n  ],\n  \"name\": \"hf-zero-gpu\"\n}",
+      "metadata": {
+        "description": "Standard configuration file used by Conda that lets you install any kind of package, including Python, R, and C/C++ packages."
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "hf-zero-gpu",
+      "metadata": {
+        "description": "The name of environment asset."
+      }
+    },
+    "environmentVersion": {
+      "type": "string",
+      "defaultValue": "1"
+    },
+    "sweepAlgorithm": {
+      "type": "string",
+      "defaultValue": "Grid",
+      "allowedValues": [ "Bayesian", "Grid", "Random" ]
+    },
+    "sweepSearchSpace": {
+      "type": "object",
+      "defaultValue": {
+          "learning_rate": ["choice", [[0.00003, 0.00005]]],
+          "weight_decay": ["choice", [[0, 0.1]]]
+      },
+      "metadata": {
+        "description": "A dictionary containing each parameter and its distribution. The dictionary key is the name of the parameter."
+      }
+    },
+    "sweepObjectivePrimaryMetric": {
+      "type": "string",
+      "defaultValue": "eval_rouge1",
+      "metadata": {
+        "description": "Defines primary metric for hyperparameter tuning. eg. 'eval_loss'"
+      }
+    },
+    "sweepObjectiveGoal": {
+      "type": "string",
+      "defaultValue": "Maximize",
+      "allowedValues": [ "Maximize", "Minimize"],
+      "metadata": {
+        "description": "Defines supported metric goals for hyperparameter tuning."
+      }
+    },
+    "sweepMaxTotalTrials": {
+      "type": "int",
+      "defaultValue": 4
+    },
+    "sweepTimeout": {
+      "type": "string",
+      "defaultValue": "PT1H",
+      "metadata": {
+        "description": "The max run duration in ISO 8601 format, after which the job will be cancelled. Only supports duration with precision as low as Seconds."
+      }
+    },
+    "sweepJobCommand": {
+      "type": "string",
+      "defaultValue": "python -m torch.distributed.launch --nproc_per_node 8 main.py --model_name_or_path 'facebook/bart-large-xsum' --dataset_name 'samsum' --max_source_length 512 --max_target_length 90 --fp16 True --seed 1 --per_device_train_batch_size 16 --per_device_eval_batch_size 16 --learning_rate $AZUREML_SWEEP_learning_rate --weight_decay $AZUREML_SWEEP_weight_decay --evaluation_strategy 'epoch' --logging_strategy 'epoch' --do_train --do_predict --predict_with_generate --overwrite_output_dir --output_dir './outputs' --logging_dir './outputs/runs' --ddp_find_unused_parameters False\n",
+      "metadata": {
+        "description": "The command to execute on startup of the job. eg. \"python train.py\""
+      }
+    },
+    "sweepJobName": {
+      "type": "string",
+      "defaultValue": "bart-samsum-sweep",
+      "metadata": {
+        "description": "The name and identifier for the Job."
+      }
+    },
+    "experimentName": {
+      "type": "string",
+      "defaultValue": "hf-sweep-demo",
+      "metadata": {
+        "description": "The name of the experiment the job belongs to."
+      }
+    }
+  },
+  "variables": {
+    "storageAccountName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'storage')]",
+    "keyVaultName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'keyvault')]",
+    "applicationInsightsName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'insights')]",
+    "containerRegistryName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'registry')]",
+    "environmentVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', parameters('workspaceName'), parameters('environmentName'), parameters('environmentVersion'))]",
+    "codeVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/codes/versions', parameters('workspaceName'), parameters('codeName'), parameters('codeVersion'))]",
+    "computeResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/computes', parameters('workspaceName'), parameters('computeName'))]",
+    "datastoreId": "[resourceId('Microsoft.MachineLearningServices/workspaces/datastores', parameters('workspaceName'), 'workspaceblobstore')]",
+    "uploadPath" : "[concat('DemoUploads/codes/', parameters('codeName'), '/v', parameters('codeVersion'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2020-11-01-preview",
+      "name": "[variables('containerRegistryName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+          "name": "basic"
+      },
+      "properties": {
+          "adminUserEnabled": true
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2019-09-01",
+      "name": "[variables('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "accessPolicies": []
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2018-05-01-preview",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-02-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": true
+            },
+            "file": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.MachineLearningServices/workspaces",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('workspaceName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[variables('storageAccountName')]",
+        "[variables('applicationInsightsName')]",
+        "[variables('keyVaultName')]",
+        "[variables('containerRegistryName')]"
+      ],
+      "identity": {
+        "type": "systemAssigned"
+      },
+      "properties": {
+        "friendlyName": "[parameters('workspaceName')]",
+        "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+        "keyVault": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "applicationInsights": "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
+        "containerRegistry": "[resourceId('Microsoft.ContainerRegistry/registries', variables('containerRegistryName'))]"
+      },
+      "resources": [
+        {
+          "type": "Microsoft.MachineLearningServices/workspaces/computes",
+          "apiVersion": "2021-04-01",
+          "name": "[concat(parameters('workspaceName'), '/', parameters('computeName'))]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[parameters('workspaceName')]"
+          ],
+          "properties": {
+            "computeType": "AmlCompute",
+            "properties": {
+              "vmSize": "[parameters('computeSize')]",
+              "vmPriority": "[parameters('computePriority')]",
+              "scaleSettings": {
+                "minNodeCount": 0,
+                "maxNodeCount": "[parameters('computeNodes')]",
+                "nodeIdleTimeBeforeScaleDown": "PT2M"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2020-10-01",
+      "name": "TxtsumUploadCode",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[parameters('workspaceName')]"
+      ],
+      "kind": "AzureCLI",
+      "properties": {
+        "azCliVersion": "2.15.0",
+        "environmentVariables": [
+          {
+            "name": "AZURE_STORAGE_KEY",
+            "secureValue": "[listKeys(resourceID('Microsoft.MachineLearningServices/workspaces', parameters('workspaceName')), '2021-04-01').userStorageKey]"
+          }
+        ],
+        "arguments": "[concat(parameters('codeUrl'), ' ', reference(variables('datastoreId'), '2021-03-01-preview').contents.containerName, ' ', variables('uploadPath'), ' ', variables('storageAccountName'))]",
+        "scriptContent": "wget $1; downloadfilename=$(basename $1); az storage blob upload -f $downloadfilename -c $2/$3 --account-name $4 -n $downloadfilename",
+        "timeout": "PT30M",
+        "cleanupPreference": "OnSuccess",
+        "retentionInterval": "P1D"
+      }
+    },
+    {
+      "name": "[concat(parameters('workspaceName'), '/', parameters('codeName'), '/', parameters('codeVersion'))]",
+      "type": "Microsoft.MachineLearningServices/workspaces/codes/versions",
+      "apiVersion": "2021-03-01-preview",
+      "dependsOn": [
+        "[parameters('workspaceName')]",
+        "TxtsumUploadCode"
+      ],
+      "properties": {
+        "datastoreId": "[variables('datastoreId')]",
+        "path": "[variables('uploadPath')]"
+      }
+    },
+    {
+      "name": "[concat(parameters('workspaceName'), '/', parameters('environmentName'), '/', parameters('environmentVersion'))]",
+      "type": "Microsoft.MachineLearningServices/workspaces/environments/versions",
+      "apiVersion": "2021-03-01-preview",
+      "dependsOn": [
+        "[parameters('workspaceName')]"
+      ],
+      "properties": {
+        "docker": {
+          "platform": {
+              "operatingSystemType": "Linux"
+          },
+          "dockerSpecificationType": "Image",
+          "dockerImageUri": "[parameters('environmentDockerImageUri')]"
+        },
+        "condaFile": "[parameters('environmentCondaFile')]"
+      }
+    },
+    {
+      "name": "[concat(parameters('workspaceName'), '/', parameters('sweepJobName'))]",
+      "type": "Microsoft.MachineLearningServices/workspaces/jobs",
+      "apiVersion": "2021-03-01-preview",
+      "dependsOn": [
+        "[parameters('workspaceName')]",
+        "[variables('codeVersionResourceId')]",
+        "[variables('environmentVersionResourceId')]",
+        "[variables('computeResourceId')]"
+      ],
+      "properties": {
+        "jobType": "Sweep",
+        "experimentName": "[parameters('experimentName')]",
+        "algorithm": "[parameters('sweepAlgorithm')]",
+        "maxConcurrentTrials": 1,
+        "maxTotalTrials": "[parameters('sweepMaxTotalTrials')]",
+        "timeout": "[parameters('sweepTimeout')]",
+        "trial": {
+          "codeId": "[variables('codeVersionResourceId')]",
+          "command": "[parameters('sweepJobCommand')]",
+          "environmentId": "[variables('environmentVersionResourceId')]",
+          "inputDataBindings": {},
+          "outputDataBindings": {}
+        },
+        "compute": {
+          "instanceCount": "[parameters('computeNodes')]",
+          "target": "[variables('computeResourceId')]"
+        },
+        "searchSpace": "[parameters('sweepSearchSpace')]",
+        "objective": {
+          "primaryMetric": "[parameters('sweepObjectivePrimaryMetric')]",
+          "goal": "[parameters('sweepObjectiveGoal')]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "result": {
+      "type": "Object",
+      "value": "[reference(resourceId('Microsoft.MachineLearningServices/workspaces/jobs', parameters('workspaceName'), parameters('sweepJobName')))]"
+    }
+  }
+}

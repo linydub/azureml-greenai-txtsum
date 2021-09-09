@@ -1,0 +1,82 @@
+{
+  "best_metric": null,
+  "best_model_checkpoint": null,
+  "epoch": 3.0,
+  "global_step": 348,
+  "is_hyper_param_search": false,
+  "is_local_process_zero": true,
+  "is_world_process_zero": true,
+  "log_history": [
+    {
+      "epoch": 1.0,
+      "learning_rate": 3.405172413793103e-05,
+      "loss": 1.5322,
+      "step": 116
+    },
+    {
+      "epoch": 1.0,
+      "eval_gen_len": 26.5795,
+      "eval_loss": 1.423577070236206,
+      "eval_rouge1": 53.9788,
+      "eval_rouge2": 29.2977,
+      "eval_rougeL": 44.7241,
+      "eval_rougeLsum": 49.3707,
+      "eval_runtime": 19.9888,
+      "eval_samples_per_second": 40.923,
+      "eval_steps_per_second": 0.35,
+      "step": 116
+    },
+    {
+      "epoch": 2.0,
+      "learning_rate": 1.7385057471264368e-05,
+      "loss": 1.1154,
+      "step": 232
+    },
+    {
+      "epoch": 2.0,
+      "eval_gen_len": 29.4071,
+      "eval_loss": 1.4339053630828857,
+      "eval_rouge1": 54.7261,
+      "eval_rouge2": 29.6473,
+      "eval_rougeL": 45.0499,
+      "eval_rougeLsum": 50.4724,
+      "eval_runtime": 20.3921,
+      "eval_samples_per_second": 40.114,
+      "eval_steps_per_second": 0.343,
+      "step": 232
+    },
+    {
+      "epoch": 3.0,
+      "learning_rate": 7.183908045977011e-07,
+      "loss": 0.9569,
+      "step": 348
+    },
+    {
+      "epoch": 3.0,
+      "eval_gen_len": 30.3435,
+      "eval_loss": 1.4327096939086914,
+      "eval_rouge1": 54.9942,
+      "eval_rouge2": 29.5803,
+      "eval_rougeL": 44.8614,
+      "eval_rougeLsum": 50.4178,
+      "eval_runtime": 20.3108,
+      "eval_samples_per_second": 40.274,
+      "eval_steps_per_second": 0.345,
+      "step": 348
+    },
+    {
+      "epoch": 3.0,
+      "step": 348,
+      "total_flos": 4.26008990669865e+16,
+      "train_loss": 1.2014821151207233,
+      "train_runtime": 261.1841,
+      "train_samples_per_second": 169.214,
+      "train_steps_per_second": 1.332
+    }
+  ],
+  "max_steps": 348,
+  "num_train_epochs": 3,
+  "total_flos": 4.26008990669865e+16,
+  "trial_name": null,
+  "trial_params": null
+}
