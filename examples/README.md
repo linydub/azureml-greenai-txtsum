@@ -28,7 +28,7 @@ bash create-assets.sh
 ## Examples
 Run the example defined through the job's YAML specification:
 ```
-az ml job create --file ./jobs/pytorch-job.yml --web --stream
+az ml job create --file ./jobs/basic-job.yml --web --stream
 ```
 Job | Status | Description
 --- | ------ | -----------
