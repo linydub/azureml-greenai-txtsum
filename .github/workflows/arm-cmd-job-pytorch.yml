@@ -1,4 +1,4 @@
-name: ARM Pytorch Job
+name: ARM Quickstart
 on:
   schedule:
     - cron: '0 18 * * 5'
@@ -10,7 +10,7 @@ on:
       - ".cloud/quickstart/azuredeployCmdJobPytorch.json"
   workflow_dispatch:
 jobs:
-  deploy-template:
+  fine-tune:
     runs-on: [self-hosted]
     steps:
       - name: Checkout repo code
