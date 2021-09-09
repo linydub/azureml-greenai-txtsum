@@ -23,7 +23,7 @@ jobs:
 
       - name: Check ML job status
         run: |
-          az ml job stream -n $${{github.RUN_ID}}
+          az ml job stream -n ${{github.RUN_ID}}
           status=$(az ml job show -n ${{github.RUN_ID}} --query status -o tsv)
           echo $status
           if [[ $status == "Completed" ]]
