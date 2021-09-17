@@ -1,0 +1,39 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code:
+    local_path: src
+command: >
+    deepspeed main.py
+    --deepspeed './configs/ds-zero2.json'
+    --model_name_or_path 'facebook/bart-large'
+    --config_name './configs/hf-bart-xsum.json'
+    --dataset_name 'samsum'
+    --dataset_path {inputs.corpus}
+    --max_source_length 512
+    --max_target_length 90
+    --fp16 True
+    --seed 1
+    --per_device_train_batch_size 16
+    --per_device_eval_batch_size 16
+    --gradient_accumulation_steps 1
+    --learning_rate 5e-5
+    --num_train_epochs 3.0
+    --weight_decay 0.1
+    --evaluation_strategy 'epoch'
+    --logging_strategy 'epoch'
+    --save_strategy 'no'
+    --do_train
+    --do_predict
+    --predict_with_generate
+    --overwrite_output_dir
+    --output_dir './outputs'
+    --logging_dir './outputs/runs'
+inputs:
+    corpus:
+        data: azureml:hf-samsum:1
+        mode: download
+environment: azureml:hf-zero-gpu:1
+compute:
+    target: azureml:gpu-v100-8
+    instance_count: 1
+experiment_name: hf-deepspeed-demo
+description: Finetune an encoder-decoder Transformer (BART) for dialogue summarization (SAMSum) with HuggingFace's DeepSpeed integration.

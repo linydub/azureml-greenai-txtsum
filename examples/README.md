@@ -26,9 +26,9 @@ bash create-assets.sh
 ```
 
 ## Examples
-Run the example defined through the job's YAML specification:
+Run a fine-tuning job defined through the example's YAML specification:
 ```
-az ml job create --file ./jobs/basic-job.yml --web --stream
+az ml job create --file ./jobs/pytorch-job.yml --web --stream
 ```
 Job | Status | Description
 --- | ------ | -----------
@@ -61,7 +61,7 @@ Job | Status | Description
 | [`jobs`](./jobs) | Example jobs for sample tasks |
 | [`jobs/src`](./jobs/src) | Example training script and configs |
 
-## Reference
+## References
 AzureML:
 - [Documentation](https://docs.microsoft.com/azure/machine-learning)
 - [2.0 CLI examples](https://github.com/Azure/azureml-examples/tree/main/cli)

@@ -18,14 +18,14 @@
     },
     "computeName": {
       "type": "string",
-      "defaultValue": "gpu-v100-8",
+      "defaultValue": "gpu-v100-4",
       "metadata": {
         "description": "Specifies the name of the Azure Machine Learning Compute cluster."
       }
     },
     "computeSize": {
       "type": "string",
-      "defaultValue": "Standard_ND40rs_v2",
+      "defaultValue": "Standard_NC24s_v3",
       "metadata": {
         "description": " The size of agent VMs. More details can be found here: https://aka.ms/azureml-vm-details."
       }
@@ -39,7 +39,7 @@
     },
     "computePriority": {
       "type": "string",
-      "defaultValue": "Dedicated",
+      "defaultValue": "LowPriority",
       "allowedValues": [ "Dedicated", "LowPriority"],
       "metadata": {
         "description": " Virtual machine priority."
@@ -47,7 +47,7 @@
     },
     "codeUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/henryu-lin/azureml-greenai-txtsum/main/examples/jobs/src/main.py",
+      "defaultValue": "https://raw.githubusercontent.com/linydub/azureml-greenai-txtsum/main/examples/jobs/src/main.py",
       "metadata": {
         "description": "Link to the training script."
       }
@@ -72,7 +72,7 @@
     },
     "environmentCondaFile": {
       "type": "string",
-      "defaultValue": "{\n  \"channels\": [\n    \"pytorch\",\n    \"nvidia\",\n    \"conda-forge\"\n  ],\n  \"dependencies\": [\n    \"python=3.8\",\n    \"pytorch=1.9.0\",\n    \"cudatoolkit=11.1\",\n    \"pip\",\n    {\n      \"pip\": [\n        \"numpy\",\n        \"nltk\",\n        \"protobuf\",\n        \"py7zr\",\n        \"sentencepiece\",\n        \"datasets\",\n        \"git+https://github.com/huggingface/transformers\",\n        \"rouge-score\",\n        \"mlflow\",\n        \"azureml-mlflow\",\n        \"codecarbon\",\n        \"deepspeed\",\n        \"fairscale\"\n      ]\n    }\n  ],\n  \"name\": \"hf-zero-gpu\"\n}",
+      "defaultValue": "{\n  \"channels\": [\n    \"pytorch\",\n    \"nvidia\",\n    \"conda-forge\"\n  ],\n  \"dependencies\": [\n    \"python=3.8\",\n    \"pytorch=1.9.0\",\n    \"cudatoolkit=11.1\",\n    \"pip\",\n    {\n      \"pip\": [\n        \"numpy\",\n        \"nltk\",\n        \"protobuf\",\n        \"py7zr\",\n        \"sentencepiece\",\n        \"datasets\",\n        \"git+https://github.com/huggingface/transformers\",\n        \"rouge-score\",\n        \"mlflow\",\n        \"azureml-mlflow\",\n        \"codecarbon\",\n        \"fairscale\",\n        \"deepspeed\"\n      ]\n    }\n  ],\n  \"name\": \"hf-zero-gpu\"\n}",
       "metadata": {
         "description": "Standard configuration file used by Conda that lets you install any kind of package, including Python, R, and C/C++ packages."
       }
@@ -131,7 +131,7 @@
     },
     "sweepJobCommand": {
       "type": "string",
-      "defaultValue": "python -m torch.distributed.launch --nproc_per_node 8 main.py --model_name_or_path 'facebook/bart-large-xsum' --dataset_name 'samsum' --max_source_length 512 --max_target_length 90 --fp16 True --seed 1 --per_device_train_batch_size 16 --per_device_eval_batch_size 16 --learning_rate $AZUREML_SWEEP_learning_rate --weight_decay $AZUREML_SWEEP_weight_decay --evaluation_strategy 'epoch' --logging_strategy 'epoch' --do_train --do_predict --predict_with_generate --overwrite_output_dir --output_dir './outputs' --logging_dir './outputs/runs' --ddp_find_unused_parameters False\n",
+      "defaultValue": "python -m torch.distributed.launch --nproc_per_node 4 main.py --model_name_or_path 'facebook/bart-base' --dataset_name 'samsum' --max_source_length 512 --max_target_length 90 --fp16 True --seed 1 --per_device_train_batch_size 16 --per_device_eval_batch_size 16 --learning_rate $AZUREML_SWEEP_learning_rate --weight_decay $AZUREML_SWEEP_weight_decay --evaluation_strategy 'epoch' --logging_strategy 'epoch' --save_strategy 'no' --do_train --do_predict --predict_with_generate --overwrite_output_dir --output_dir './outputs' --logging_dir './outputs/runs' --ddp_find_unused_parameters False\n",
       "metadata": {
         "description": "The command to execute on startup of the job. eg. \"python train.py\""
       }
@@ -153,7 +153,7 @@
   },
   "variables": {
     "storageAccountName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'storage')]",
-    "keyVaultName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'keyvault')]",
+    "keyVaultName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'vault')]",
     "applicationInsightsName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'insights')]",
     "containerRegistryName": "[concat(uniqueString(parameters('workspaceName'), resourceGroup().id), 'registry')]",
     "environmentVersionResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces/environments/versions', parameters('workspaceName'), parameters('environmentName'), parameters('environmentVersion'))]",

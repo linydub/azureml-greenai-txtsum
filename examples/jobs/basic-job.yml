@@ -3,8 +3,8 @@ code:
     local_path: src
 command: >
     python main.py
-    --model_name_or_path "facebook/bart-base"
-    --dataset_name "samsum"
+    --model_name_or_path 'facebook/bart-base'
+    --dataset_name 'samsum'
     --max_source_length 512
     --max_target_length 90
     --seed 1
@@ -17,8 +17,8 @@ command: >
     --do_eval
     --do_predict
     --overwrite_output_dir
-    --output_dir "./outputs"
-    --logging_dir "./outputs/runs"
+    --output_dir './outputs'
+    --logging_dir './outputs/runs'
     --ddp_find_unused_parameters False
 environment: azureml:hf-zero-gpu:1
 compute:

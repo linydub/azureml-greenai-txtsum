@@ -6,10 +6,9 @@ trial:
         local_path: src
     command: >
         python -m torch.distributed.launch
-        --nproc_per_node 8 main.py
-        --model_name_or_path "facebook/bart-large"
-        --config_name "./configs/hf-bart-xsum.json"
-        --dataset_name "samsum"
+        --nproc_per_node 4 main.py
+        --model_name_or_path 'facebook/bart-base'
+        --dataset_name 'samsum'
         --dataset_path {inputs.corpus}
         --max_source_length 512
         --max_target_length 90
@@ -21,14 +20,15 @@ trial:
         --learning_rate {search_space.lr}
         --num_train_epochs 3.0
         --weight_decay {search_space.wd}
-        --evaluation_strategy "epoch"
-        --logging_strategy "epoch"
+        --evaluation_strategy 'epoch'
+        --logging_strategy 'epoch'
+        --save_strategy 'no'
         --do_train
         --do_predict
         --predict_with_generate
         --overwrite_output_dir
-        --output_dir "./outputs"
-        --logging_dir "./outputs/runs"
+        --output_dir './outputs'
+        --logging_dir './outputs/runs'
         --ddp_find_unused_parameters False
     inputs:
         corpus:
@@ -36,7 +36,7 @@ trial:
             mode: download
     environment: azureml:hf-zero-gpu:1
     compute:
-        target: azureml:gpu-v100-8
+        target: azureml:gpu-v100-4
         instance_count: 1
 search_space:
     lr:
@@ -52,4 +52,4 @@ max_total_trials: 4
 max_concurrent_trials: 1
 timeout_minutes: 60
 experiment_name: hf-sweep-demo
-description: Hyperparameter tune an encoder-decoder Transformer model (BART) for dialogue summarization (SAMSum) with a grid search sweep job.
+description: Hyperparameter tune an encoder-decoder Transformer model (BART-Base) for dialogue summarization (SAMSum) with a grid search sweep job.

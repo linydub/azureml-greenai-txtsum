@@ -61,8 +61,8 @@ This model was trained using Microsoft's [`Azure Machine Learning Service`](http
 ## Fine-tune on AzureML
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Flinydub%2Fazureml-greenai-txtsum%2Fmain%2F.cloud%2Ftemplate-hub%2Fischool-greenai%2Farm-bart-large-samsum.json) [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https://raw.githubusercontent.com/linydub/azureml-greenai-txtsum/main/.cloud/template-hub/ischool-greenai/arm-bart-large-samsum.json)
 
-**[PREVIEW]** More information about the fine-tuning process (includes samples and benchmarks):  
-https://github.com/linydub/azureml-greenai-txtsum
+More information about the fine-tuning process (including samples and benchmarks):  
+**[Preview]** https://github.com/linydub/azureml-greenai-txtsum
 
 ## Usage (Inference)
 ```python

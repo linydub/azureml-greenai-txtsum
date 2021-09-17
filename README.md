@@ -12,16 +12,16 @@ This repo currently contains samples to fine-tune [HuggingFace models](https://h
 ### What's available now?
 * **[New]** Quickstart ARM Templates for fine-tuning HuggingFace models
 * AzureML 2.0 CLI examples for fine-tuning HuggingFace models
-* HuggingFace example models & fine-tuning results: https://huggingface.co/henryu-lin
+* Fine-tuned HuggingFace models & results: https://huggingface.co/linydub
 
 ### What's coming next?
 * Benchmarking and carbon accounting with MLflow and Azure Monitor Metrics (performance + resource metrics)
 * Interactive data visualization example with Azure Monitor Workbook
-* Documentation and guide for the fine-tuning samples
-* Fine-tuning benchmark results (comparison experiments)
+* Documentation and detailed guide for the fine-tuning samples
+* More fine-tuned models and benchmarks
 
 ### Future steps
-* AML 2.0 CLI inference samples with ONNX Runtime and NVIDIA Triton (AML endpoints & deployments)
+* AML 2.0 CLI inference samples with ONNX Runtime and NVIDIA Triton (AML endpoint & deployment)
 * AML 2.0 CLI end-to-end pipeline samples
 
 ## Contents
