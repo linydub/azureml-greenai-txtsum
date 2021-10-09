@@ -1,1 +1,0 @@
-az ml compute create --file ./gpu-v100-lp.yml

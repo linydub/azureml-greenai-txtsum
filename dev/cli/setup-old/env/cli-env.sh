@@ -1,0 +1,1 @@
+az ml environment create --file ./hf-env.yml

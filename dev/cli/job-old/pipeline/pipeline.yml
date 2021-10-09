@@ -1,0 +1,32 @@
+type: pipeline_job
+
+inputs:
+    corpus:
+        data: azureml:hf-xsum:1
+        mode: download
+
+outputs:
+    finetune_output_dir:
+        data:
+            path: ./testrun/outputs
+            datastore: azureml:txtsumstorage_azureml
+    finetune_logging_dir:
+        data:
+            path: ./testrun/logs
+            datastore: azureml:txtsumstorage_azureml
+
+jobs:
+    finetune:
+        type: component_job
+        component: azureml:hf-finetune:1
+        compute:
+            target: azureml:gpu-v100-8
+            instance_count: 1
+        distribution:
+            type: pytorch
+            process_count: 8
+        inputs:
+            dataset: inputs.corpus
+        outputs:
+            output_dir: outputs.finetune_output_dir
+            logging_dir: outputs.finetune_logging_dir

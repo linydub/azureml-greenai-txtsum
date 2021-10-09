@@ -1,0 +1,1 @@
+az storage blob directory upload -c azureml --account-name $AZURE_STORAGE_ACCOUNT -s "./examples/assets/data/hf-samsum" -d "Datasets" --recursive

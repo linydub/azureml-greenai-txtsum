@@ -10,19 +10,19 @@
 This repo currently contains samples to fine-tune [HuggingFace models](https://huggingface.co/models) for text summarization using [Microsoft's Azure Machine Learning service](https://azure.microsoft.com/en-us/services/machine-learning-service/). These samples could be adapted to fine-tune models for other NLP tasks or product scenarios.
 
 ### What's available now?
-* **[New]** Quickstart ARM Templates for fine-tuning HuggingFace models
-* AzureML 2.0 CLI examples for fine-tuning HuggingFace models
+* AzureML v2 CLI examples for fine-tuning HuggingFace models
+* Quickstart ARM Templates for fine-tuning HuggingFace models
 * Fine-tuned HuggingFace models & results: https://huggingface.co/linydub
 
 ### What's coming next?
 * Benchmarking and carbon accounting with MLflow and Azure Monitor Metrics (performance + resource metrics)
 * Interactive data visualization example with Azure Monitor Workbook
-* Documentation and detailed guide for the fine-tuning samples
-* More fine-tuned models and benchmarks
+* AML v2 CLI inference samples with ONNX Runtime and NVIDIA Triton (AML endpoint & deployment)
+* AML v2 CLI end-to-end pipeline samples
+* Repository documentation and detailed guide for the samples
+* More fine-tuned models and benchmark results
 
-### Future steps
-* AML 2.0 CLI inference samples with ONNX Runtime and NVIDIA Triton (AML endpoint & deployment)
-* AML 2.0 CLI end-to-end pipeline samples
+**More details about the project and future plans could be found [here](../../projects).*
 
 ## Contents
 | Directory | Description |
@@ -55,12 +55,14 @@ All logged training metrics are automatically reported to AzureML and MLflow. Co
 
 More advanced ARM Templates will be available [here](./.cloud).
 
-## AzureML 2.0 CLI Examples
+## AzureML v2 CLI Examples
 Fine-tuning samples using AML 2.0 CLI could be found [here](./examples).
+
+# Inference Samples
 
 ## Jupyter Notebooks
 | Notebook | Description |
 | -------- | ----------- |
 
 # Support/Feedback
-Please file an issue through the repo or email me at liny62@uw.edu
+Please file an issue through the repo or email me at liny62@uw.edu. Feedback is greatly appreciated 🤗

@@ -1,0 +1,19 @@
+name: hf-conda-base
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+    - torch
+    - numpy
+    - nltk
+    - protobuf
+    - py7zr
+    - sentencepiece
+    - ray[tune]
+    - datasets
+    - transformers
+    - rouge-score
+    - mlflow
+    - azureml-mlflow

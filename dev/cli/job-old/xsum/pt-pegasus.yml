@@ -1,0 +1,56 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+experiment_name: xsum
+tags:
+    model: "pegasus-large"
+    seed: "1"
+    epoch: "10.0"
+    learning_rate: "1e-4"
+    batch_size: "256"
+code:
+    local_path: ../../src
+command: >
+    python trainer-wip.py 
+    --model_name_or_path "google/pegasus-large" 
+    --config_name "./configs/pegasus-xsum-config.json" 
+    --dataset_name "xsum" 
+    --dataset_path {inputs.corpus} 
+    --max_source_length 512 
+    --max_target_length 64 
+    --ddp_find_unused_parameters False 
+    --fp16 False 
+    --adafactor True 
+    --seed 1 
+    --per_device_train_batch_size 8 
+    --per_device_eval_batch_size 16 
+    --gradient_accumulation_steps 4 
+    --learning_rate 1e-4 
+    --weight_decay 0.01 
+    --label_smoothing_factor 0.1 
+    --num_train_epochs 10.0 
+    --evaluation_strategy "epoch" 
+    --logging_strategy "epoch" 
+    --freeze_embeds False 
+    --freeze_encoder False 
+    --train_early_stopping True 
+    --early_stopping_patience 2 
+    --early_stopping_threshold 0.0 
+    --load_best_model_at_end True 
+    --metric_for_best_model "eval_rouge2" 
+    --greater_is_better True 
+    --do_train 
+    --do_predict 
+    --predict_with_generate 
+    --overwrite_output_dir 
+    --output_dir "./outputs/hf-model" 
+    --logging_dir "./logs" 
+environment: azureml:hf-deepspeed:3
+inputs:
+    corpus:
+        data: azureml:hf-xsum:1
+        mode: download
+compute:
+    target: azureml:gpu-v100-8-lp
+    instance_count: 1
+distribution:
+    type: pytorch
+    process_count: 8

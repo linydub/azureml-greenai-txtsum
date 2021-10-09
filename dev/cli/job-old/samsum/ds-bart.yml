@@ -1,0 +1,37 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+experiment_name: samsum
+code:
+    local_path: ../../src
+command: >
+    deepspeed trainer-wip.py 
+    --deepspeed "./configs/ds_zero2.json" 
+    --model_name_or_path "facebook/bart-large" 
+    --config_name "./configs/bart-xsum-config.json" 
+    --dataset_name "samsum" 
+    --dataset_path {inputs.corpus} 
+    --max_source_length 512 
+    --max_target_length 90 
+    --fp16 True 
+    --seed 1 
+    --per_device_train_batch_size 16 
+    --per_device_eval_batch_size 16 
+    --gradient_accumulation_steps 1 
+    --learning_rate 5e-5 
+    --num_train_epochs 3.0 
+    --weight_decay 0.1 
+    --evaluation_strategy "epoch"
+    --logging_strategy "epoch" 
+    --do_train 
+    --do_predict 
+    --predict_with_generate 
+    --overwrite_output_dir 
+    --output_dir "./outputs" 
+    --logging_dir "./logs"
+environment: azureml:hf-deepspeed:3
+inputs:
+    corpus:
+        data: azureml:hf-samsum:1
+        mode: download
+compute:
+    target: azureml:gpu-v100-8-lp
+    instance_count: 1

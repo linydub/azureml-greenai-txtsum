@@ -1,9 +1,9 @@
-# AzureML 2.0 CLI HuggingFace Fine-tuning Examples
+# AzureML v2 CLI HuggingFace Fine-tuning Examples
 
 ## Prerequisites
 1. If you don't have an Azure subscription, [create a free account](https://aka.ms/AMLFree).
-2. Install and configure the [2.0 CLI machine learning extension](https://docs.microsoft.com/azure/machine-learning/how-to-configure-cli).
-3. (Optional) Read over the documentation for [2.0 CLI jobs](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-train-cli).
+2. Install and configure the [v2 CLI machine learning extension](https://docs.microsoft.com/azure/machine-learning/how-to-configure-cli).
+3. (Optional) Read over the documentation for [v2 CLI jobs](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-train-cli).
 
 ## Setup
 1. Clone this repository and navigate to the examples directory:
@@ -13,7 +13,7 @@ git clone https://github.com/linydub/azureml-greenai-txtsum.git
 cd azureml-greenai-txtsum/examples
 ```
 
-2. Create a new Azure resource group and machine learning workspace and set defaults for resource group and workspace:
+2. Create a new Azure resource group and machine learning workspace, then set defaults for Azure CLI:
 
 ```bash
 bash setup.sh
@@ -64,8 +64,8 @@ Job | Status | Description
 ## References
 AzureML:
 - [Documentation](https://docs.microsoft.com/azure/machine-learning)
-- [2.0 CLI examples](https://github.com/Azure/azureml-examples/tree/main/cli)
-- [Private previews](https://github.com/Azure/azureml-previews)
+- [v2 CLI examples](https://github.com/Azure/azureml-examples/tree/main/cli)
+- [v2 CLI private previews](https://github.com/Azure/azureml-previews)
 
 HuggingFace:
 - [Transformers documentation](https://huggingface.co/transformers/master/index.html)

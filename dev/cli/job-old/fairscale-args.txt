@@ -1,0 +1,16 @@
+FairScale simple wrapper:
+    --sharded_ddp "simple" 
+
+Compatibility:
+    --predict_with_generate False # set false
+    -m torch.distributed.launch --nproc_per_node 2 # must be distributed (multi-gpu)
+
+Optimized version of simple wrapper:
+    --sharded_ddp "zero_dp_2 auto_wrap" 
+
+Fully sharded (model weights, gradients, optimizer states):
+    --sharded_ddp "zero_dp_3 auto_wrap" 
+
+CPU offload:
+    --sharded_ddp "zero_dp_3 auto_wrap offload" # added with zero_dp_2 or zero_dp_3
+    --fp16 True # required

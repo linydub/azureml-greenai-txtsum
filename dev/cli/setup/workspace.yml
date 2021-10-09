@@ -1,8 +1,0 @@
-$schema: https://azuremlschemas.azureedge.net/latest/workspace.schema.json
-name: TxtSum
-location: WestUS2
-friendly_name: ml-workspace-txtsum
-description: NLP Text Summarization ML Workspace
-tags:
-  purpose: research
-  team: uw-embeddings

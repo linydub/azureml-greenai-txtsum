@@ -1,0 +1,189 @@
+Early stopping:
+    --train_early_stopping True 
+    --early_stopping_patience 3 
+    --early_stopping_threshold 0.05 
+    --load_best_model_at_end True 
+    --metric_for_best_model "eval_rouge2" 
+    --greater_is_better True 
+
+Param Freezing:
+    --freeze_embeds False 
+    --freeze_encoder False 
+
+    --sortish_sampler True 
+    --fp16_full_eval True 
+
+    --ddp_find_unused_parameters False 
+
+    --cache_dir {inputs.cache}
+cache:
+    data:
+        datastore: azureml:workspaceblobstore
+        path: HuggingFaceCache
+    mode: mount
+
+"inputs": {
+    "title": "inputs",
+    "type": "object",
+    "additionalProperties": {
+        "type": "object",
+        "$ref": "#/definitions/InputEntrySchema"
+    }
+},
+
+"InputEntrySchema": {
+    "type": "object",
+    "properties": {
+        "data": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "pattern": "^azureml:.*",
+                    "arm_type": "data",
+                    "title": "data"
+                },
+                {
+                    "type": "object",
+                    "$ref": "#/definitions/AnonymousAssetSchema"
+                },
+                {
+                    "type": "string",
+                    "pattern": "^file:.*"
+                }
+            ]
+        },
+        "mode": {
+            "type": "string",
+            "enum": [
+                "mount",
+                "download"
+            ],
+            "title": "mode"
+        }
+    },
+    "additionalProperties": false
+},
+"AnonymousAssetSchema": {
+    "type": "object",
+    "properties": {
+        "arm_id": {
+            "type": "string",
+            "pattern": "^azureml:.*",
+            "arm_type": "data",
+            "title": "arm_id",
+            "readonly": true
+        },
+        "creation_context": {
+            "type": "object",
+            "$ref": "#/definitions/CreationContextSchema"
+        },
+        "datastore": {
+            "type": "string",
+            "pattern": "^azureml:.*",
+            "arm_type": "datastores",
+            "title": "datastore"
+        },
+        "description": {
+            "title": "description",
+            "type": "string"
+        },
+        "id": {
+            "title": "id",
+            "type": "string"
+        },
+        "local_path": {
+            "title": "local_path",
+            "type": "string",
+            "description": "the path from which the data gets uploaded to the cloud"
+        },
+        "name": {
+            "title": "name",
+            "type": "string",
+            "readonly": true
+        },
+        "path": {
+            "title": "path",
+            "type": "string",
+            "description": "URI pointing to a file or directory."
+        },
+        "$schema": {
+            "title": "$schema",
+            "type": "string",
+            "readonly": true
+        },
+        "tags": {
+            "title": "tags",
+            "type": "object",
+            "additionalProperties": {}
+        },
+        "version": {
+            "title": "version",
+            "type": "number",
+            "format": "integer",
+            "readonly": true
+        }
+    },
+    "additionalProperties": false
+},
+
+"output": {
+    "type": "object",
+    "$ref": "#/definitions/JobOutputSchema",
+    "description": "The output configurations for the component used."
+}
+
+"JobOutputSchema": {
+    "type": "object",
+    "properties": {
+        "datastore_id": {
+            "type": "string",
+            "pattern": "^azureml:.*",
+            "arm_type": "datastores",
+            "title": "datastore_id"
+        },
+        "path": {
+            "title": "path",
+            "type": "string"
+        }
+    },
+
+"dataReferences": {
+    "2a248c2c59104564a51f11010f31b86f": {
+        "dataStoreName": "turingnlr",
+        "mode": "Download",
+        "pathOnDataStore": "tnlrv3-base.pt",
+        "pathOnCompute": null,
+        "overwrite": false
+    },
+    "6162d8a1a7a94a9f85fcd906e3e4ff5c": {
+        "dataStoreName": "workspaceblobstore",
+        "mode": "Mount",
+        "pathOnDataStore": "glue_data/SST-2/",
+        "pathOnCompute": null,
+        "overwrite": false
+    },
+    "9a2a7f376e9642258fe3a38d39cbaae1": {
+        "dataStoreName": "workspaceblobstore",
+        "mode": "Mount",
+        "pathOnDataStore": "outputs/glue-outputs/",
+        "pathOnCompute": null,
+        "overwrite": false
+    }
+},
+"data": {
+    "corpus": {
+        "dataLocation": {
+            "dataset": {
+                "id": "afccf0b7-510c-45da-bc51-ea9249cf9cf1",
+                "name": "hf-samsum",
+                "version": "1"
+            },
+            "dataPath": null,
+            "uri": null
+        },
+        "mechanism": "Download",
+        "environmentVariableName": "AZURE_ML_INPUT_corpus",
+        "pathOnCompute": null,
+        "overwrite": true
+    }
+},

@@ -1,0 +1,1 @@
+az ml data create --file ./data-local.yml

@@ -1,0 +1,57 @@
+$schema: https://azuremlschemas.azureedge.net/latest/sweepJob.schema.json
+experiment_name: hf-sweep
+description: bart samsum batch size
+type: sweep_job
+algorithm: random
+trial:
+    code: 
+        local_path: ../../src
+    command: >
+        python -m torch.distributed.launch 
+        --nproc_per_node 8 trainer-wip.py 
+        --model_name_or_path "facebook/bart-base" 
+        --config_name "./configs/bart-base-config.json" 
+        --dataset_name "samsum" 
+        --dataset_path {inputs.corpus} 
+        --max_source_length 512 
+        --max_target_length 90 
+        --ddp_find_unused_parameters False 
+        --fp16 True 
+        --seed 1 
+        --per_device_train_batch_size 16 
+        --per_device_eval_batch_size 16 
+        --gradient_accumulation_steps 1 
+        --learning_rate {search_space.lr} 
+        --num_train_epochs 3.0 
+        --evaluation_strategy "epoch" 
+        --logging_strategy "epoch" 
+        --do_train 
+        --do_predict 
+        --predict_with_generate 
+        --overwrite_output_dir 
+        --output_dir "./outputs" 
+        --logging_dir "./logs" 
+    environment: azureml:hf-deepspeed:3
+    inputs:
+        corpus:
+            data: azureml:hf-samsum:1
+            mode: download
+    compute:
+        target: azureml:gpu-v100-8-lp
+        instance_count: 1
+search_space:
+    lr:
+        type: choice
+        values: [0.00003, 0.00005]
+    weight_decay:
+        type: choice
+        values: [0.0, 0.1, 0.01]
+    epoch:
+        type: choice
+        values: [3.0, 5.0, 7.0]
+objective:
+    primary_metric: eval_rouge1
+    goal: maximize
+max_total_trials: 12
+max_concurrent_trials: 1
+timeout_minutes: 900
