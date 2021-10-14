@@ -1,1 +1,0 @@
-# gh-actions-runner setup with azure vm & user-assigned managed identity

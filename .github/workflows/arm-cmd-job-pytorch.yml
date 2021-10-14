@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - ".github/workflows/arm-cmd-job-pytorch.yml"
-      - ".cloud/quickstart/azuredeployCmdJobPytorch.json"
+      - "cloud/quickstart/azuredeployCmdJobPytorch.json"
   workflow_dispatch:
 jobs:
   fine-tune:
@@ -19,7 +19,7 @@ jobs:
       - name: Deploy ARM template
         run: |
           az deployment group create --resource-group ${{secrets.AZURE_RESOURCE_GROUP}} --template-file ./azuredeployCmdJobPytorch.json --parameters workspaceName='${{secrets.AZUREML_WORKSPACE}}' location='${{secrets.AZUREML_LOCATION}}' jobName='${{github.RUN_ID}}' computePriority='Dedicated'
-        working-directory: .cloud/quickstart
+        working-directory: cloud/quickstart
 
       - name: Check ML job status
         run: |

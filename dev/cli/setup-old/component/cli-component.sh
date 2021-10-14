@@ -1,1 +1,0 @@
-az ml component create --file ./cmp-finetune.yml

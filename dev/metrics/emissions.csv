@@ -1,2 +1,0 @@
-timestamp,experiment_id,project_name,duration,emissions,energy_consumed,country_name,country_iso_code,region,on_cloud,cloud_provider,cloud_region
-2021-08-29T02:52:00,533a7bd5-6e41-4fd2-8663-b5d10688f094,codecarbon,259.66216683387756,0.02725333842896313,0.09157707805431159,USA,USA,Washington,Y,azure,westus2
