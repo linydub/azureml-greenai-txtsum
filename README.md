@@ -1,9 +1,9 @@
-﻿# Microsoft GreenAI: NLP Text Summarization (preview)
+# Microsoft GreenAI: NLP Text Summarization (preview)
 [![ARM Quickstart](../../actions/workflows/arm-cmd-job-pytorch.yml/badge.svg)](../../actions/workflows/arm-cmd-job-pytorch.yml) [![CLI Job](../../actions/workflows/cli-cmd-job-basic.yml/badge.svg)](../../actions/workflows/cli-cmd-job-basic.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 <p align="center">
-  <img src="research-project/images/azureml-icon.png" alt="azureml icon" height="80"/>
-  <img src="research-project/images/plus-icon.png" alt="plus" height="50"/>
+  <img src="docs/images/azureml-icon.png" alt="azureml icon" height="80"/>
+  <img src="docs/images/plus-icon.png" alt="plus" height="50"/>
   <img src="https://huggingface.co/front/assets/huggingface_logo.svg" alt="huggingface icon" height="80"/>
 </p>
 
